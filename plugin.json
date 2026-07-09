@@ -1,11 +1,12 @@
 {
-  "name": "Example Plugin",
-  "author": "John Doe",
-  "flags": ["debug", "_root"],
+  "name": "lampa-deck",
+  "version": "1.0.1",
+  "author": "rosakodu",
+  "flags": [],
   "api_version": 1,
   "publish": {
-    "tags": ["template", "root"],
-    "description": "Decky example plugin.",
-    "image": "https://opengraph.githubassets.com/1/SteamDeckHomebrew/PluginLoader"
+    "tags": ["media", "streaming", "torrent"],
+    "description": "Lampa Client with built-in TorrServer Matrix for Steam Deck.",
+    "image": "https://raw.githubusercontent.com/yumata/lampa/master/img/icons/icon-192x192.png"
   }
 }
