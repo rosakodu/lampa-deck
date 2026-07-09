@@ -11,6 +11,7 @@ import time
 import socketserver
 import http.server
 import decky
+import ssl
 
 # Insert plugin folder to sys.path
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -108,7 +109,8 @@ class Plugin:
             headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}
         )
         try:
-            with urllib.request.urlopen(req, timeout=30) as response, open(bin_path, 'wb') as out_file:
+            context = ssl._create_unverified_context()
+            with urllib.request.urlopen(req, timeout=30, context=context) as response, open(bin_path, 'wb') as out_file:
                 shutil.copyfileobj(response, out_file)
             # Make executable
             os.chmod(bin_path, os.stat(bin_path).st_mode | stat.S_IEXEC)
@@ -153,16 +155,21 @@ class Plugin:
     def wait_and_optimize_torrserver(self):
         time.sleep(3) # Wait for startup
         url = f"http://127.0.0.1:{self.port_torrserver}/settings"
+        
         payload = {
-            "CacheSize": 268435456,  # 256 MB buffer in RAM
-            "ReaderReadAHead": 95,
-            "PreloadCache": 25,
-            "UseDisk": False,
-            "ConnectionsLimit": 150
+            "action": "set",
+            "sets": {
+                "CacheSize": 268435456,  # 256 MB buffer in RAM
+                "ReaderReadAHead": 95,
+                "PreloadCache": 25,
+                "UseDisk": False,
+                "ConnectionsLimit": 150
+            }
         }
-        data = json.dumps(payload).encode('utf-8')
-        req = urllib.request.Request(url, data=data, headers={'Content-Type': 'application/json'})
+        
         try:
+            data = json.dumps(payload).encode('utf-8')
+            req = urllib.request.Request(url, data=data, headers={'Content-Type': 'application/json'})
             with urllib.request.urlopen(req, timeout=5) as response:
                 res_data = response.read().decode('utf-8')
                 decky.logger.info(f"TorrServer optimized settings updated successfully: {res_data}")
@@ -242,8 +249,14 @@ class Plugin:
         decky.logger.info("Unloading Lampa Decky Plugin...")
         self.stop_torrserver()
         if self.httpd:
-            self.httpd.shutdown()
-            self.httpd.server_close()
+            try:
+                self.httpd.server_close()
+            except Exception as e:
+                decky.logger.error(f"Failed to close HTTP server: {e}")
+            try:
+                threading.Thread(target=self.httpd.shutdown, daemon=True).start()
+            except Exception as e:
+                decky.logger.error(f"Failed to shutdown HTTP server: {e}")
 
     # Asyncio-compatible uninstall
     async def _uninstall(self):
