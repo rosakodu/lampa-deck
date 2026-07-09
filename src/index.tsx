@@ -2,12 +2,18 @@ import {
   ButtonItem,
   PanelSection,
   PanelSectionRow,
-  staticClasses
+  staticClasses,
+  Router,
+  Navigation,
+  Focusable,
+  findModuleChild,
+  findClassModule
 } from "@decky/ui";
 import {
   callable,
   definePlugin,
-  toaster
+  toaster,
+  routerHook
 } from "@decky/api";
 import { useState, useEffect } from "react";
 import { FaFilm } from "react-icons/fa";
@@ -15,7 +21,106 @@ import { FaFilm } from "react-icons/fa";
 // Python backend callables
 const getTorrserverStatus = callable<[], boolean>("get_torrserver_status");
 const restartTorrserver = callable<[], boolean>("restart_torrserver");
-const openLampa = callable<[], boolean>("open_lampa");
+
+// Find Steam's internal BrowserContainer component
+const BrowserContainer = findModuleChild((mod) => {
+  if (typeof mod !== 'object')
+    return undefined;
+  for (let prop in mod) {
+    if (typeof mod[prop] === 'function') {
+      const f = mod[prop].toString();
+      if (f.includes('displayURLBar') && f.includes('BExternalTriggeredLoad()'))
+        return mod[prop];
+    }
+  }
+});
+
+// Find Steam's internal browser classes for styling
+const browserClasses = (findClassModule((m) => !!m['MainBrowserContainer']) || {}) as Record<string, string>;
+
+function LampaBrowser() {
+  const [browser, setBrowser] = useState<any>(null);
+
+  useEffect(() => {
+    const windowRouter = Router.WindowStore?.GamepadUIMainWindowInstance;
+    if (!windowRouter) {
+      console.error("LampaBrowser: GamepadUIMainWindowInstance not found!");
+      return;
+    }
+
+    console.log("LampaBrowser: Creating BrowserView...");
+    const newBrowser = (windowRouter as any).CreateBrowserView("LampaBrowserView");
+    if (newBrowser) {
+      newBrowser.LoadURL("http://127.0.0.1:8000");
+      setBrowser(newBrowser);
+    }
+
+    return () => {
+      if (newBrowser) {
+        console.log("LampaBrowser: Destroying BrowserView...");
+        try {
+          newBrowser.m_browserView?.SetFocus(false);
+        } catch (e) {
+          console.error("LampaBrowser: Failed to unfocus browser view", e);
+        }
+        setTimeout(() => {
+          try {
+            newBrowser.Destroy();
+          } catch (e) {
+            console.error("LampaBrowser: Failed to destroy browser view", e);
+          }
+        }, 200);
+      }
+    };
+  }, []);
+
+  if (!BrowserContainer) {
+    return (
+      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100%", width: "100%", color: "red", padding: "20px", textAlign: "center" }}>
+        <span>Ошибка: Не удалось инициализировать встроенный браузер Steam.</span>
+      </div>
+    );
+  }
+
+  if (!browser) {
+    return (
+      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100%", width: "100%", color: "white" }}>
+        <span>Загрузка Lampa...</span>
+      </div>
+    );
+  }
+
+  const focusableActionProps = {
+    onCancelButton: () => {
+      Navigation.NavigateBack();
+    },
+    onCancelActionDescription: "Назад"
+  };
+
+  return (
+    <div style={{ width: "100%", height: "100%" }}>
+      <Focusable
+        className="focus-container"
+        noFocusRing={true}
+        onGamepadFocus={async (evt: any) => {
+          await new Promise((resolve) => setTimeout(resolve, 1));
+          evt.detail.focusedNode?.BChildTakeFocus();
+        }}
+        {...focusableActionProps}
+      >
+        <BrowserContainer
+          browser={browser}
+          className={browserClasses.ExternalBrowserContainer || "ExternalBrowserContainer"}
+          visible={true}
+          hideForModals={true}
+          external={true}
+          displayURLBar={false}
+          autoFocus={true}
+        />
+      </Focusable>
+    </div>
+  );
+}
 
 function Content() {
   const [status, setStatus] = useState(false);
@@ -52,15 +157,20 @@ function Content() {
     }
   };
 
-  const handleOpenLampa = async () => {
+  const handleOpenLampa = () => {
     try {
-      await openLampa();
+      Router.CloseSideMenus();
+      Navigation.Navigate("/lampa-browser");
       toaster.toast({
         title: "Lampa Deck",
         body: "Запуск Lampa во встроенном браузере..."
       });
     } catch (e) {
       console.error(e);
+      toaster.toast({
+        title: "Lampa Deck",
+        body: "Ошибка запуска во встроенном браузере."
+      });
     }
   };
 
@@ -113,6 +223,8 @@ function Content() {
 export default definePlugin(() => {
   console.log("Lampa Decky Plugin initializing...");
 
+  routerHook.addRoute("/lampa-browser", LampaBrowser);
+
   return {
     name: "Lampa Deck",
     titleView: <div className={staticClasses.Title}>Lampa Deck</div>,
@@ -120,6 +232,8 @@ export default definePlugin(() => {
     icon: <FaFilm />,
     onDismount() {
       console.log("Lampa Decky Plugin unloading...");
+      routerHook.removeRoute("/lampa-browser");
     },
   };
 });
+
