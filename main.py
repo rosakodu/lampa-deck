@@ -86,8 +86,19 @@ class Plugin:
             if key in env:
                 del env[key]
 
+        # Inject graphical environment variables so VLC flatpak can access the display server
+        env["DISPLAY"] = ":0"
+        env["WAYLAND_DISPLAY"] = "wayland-0"
+        env["XDG_RUNTIME_DIR"] = "/run/user/1000"
+
         video_url = url.replace('&preload', '&play')
         cmd_parts = player_path.split(' ') if ' ' in player_path else [player_path]
+        
+        # If running as root, switch execution context to the standard deck user
+        if os.geteuid() == 0:
+            user = getattr(decky, "DECKY_USER", "deck")
+            cmd_parts = ["sudo", "-u", user] + cmd_parts
+            
         cmd_parts.append(video_url)
 
         try:
