@@ -170,11 +170,24 @@ class Plugin:
             plugin_bin_dir = os.path.join(self.plugin_dir, "bin")
             env["PATH"] = f"{plugin_bin_dir}:{env.get('PATH', '')}"
 
+            log_dir = "/home/deck/homebrew/logs/lampa-deck"
+            os.makedirs(log_dir, exist_ok=True)
+            log_file_path = os.path.join(log_dir, "torrserver.log")
+            
+            try:
+                self.torrserver_log_file = open(log_file_path, "a")
+                stdout_val = self.torrserver_log_file
+                stderr_val = self.torrserver_log_file
+            except Exception as le:
+                decky.logger.error(f"Failed to open TorrServer log file: {le}")
+                stdout_val = subprocess.DEVNULL
+                stderr_val = subprocess.DEVNULL
+
             self.torrserver_process = subprocess.Popen([
                 bin_path,
                 "-p", str(self.port_torrserver),
                 "-d", db_path
-            ], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, start_new_session=True, env=env)
+            ], stdout=stdout_val, stderr=stderr_val, start_new_session=True, env=env)
             
             # Start optimization task
             threading.Thread(target=self.wait_and_optimize_torrserver, daemon=True).start()
