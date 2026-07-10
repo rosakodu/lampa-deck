@@ -89,13 +89,16 @@ class Plugin:
         for key in ["LD_LIBRARY_PATH", "LD_PRELOAD", "APPDIR", "APPIMAGE"]:
             env.pop(key, None)
         
-        # Set environment variables required for graphical applications
+        # Set environment variables required for graphical applications and audio
         env["DISPLAY"] = ":0"
         env["WAYLAND_DISPLAY"] = "wayland-0"
         env["XDG_RUNTIME_DIR"] = "/run/user/1000"
         env["HOME"] = "/home/deck"
         env["USER"] = "deck"
         env["DBUS_SESSION_BUS_ADDRESS"] = "unix:path=/run/user/1000/bus"
+        env["PULSE_SERVER"] = "unix:/run/user/1000/pulse/native"
+        env["PULSE_COOKIE"] = "/home/deck/.config/pulse/cookie"
+        env["PIPEWIRE_RUNTIME_DIR"] = "/run/user/1000"
         
         cmd_parts = player_path.split()
         cmd_parts.append(video_url)
