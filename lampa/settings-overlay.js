@@ -71,17 +71,19 @@
               console.error('Failed to trigger play on backend:', err);
             });
         } else {
-          // Intercept TorrServer play URLs and rewrite them to use GStreamer HLS transcoding
-          if (data.url && data.url.indexOf('/play/') !== -1) {
-            const match = data.url.match(/\/play\/([a-fA-F0-9]+)\/(\d+)/);
-            if (match) {
-              const hash = match[1];
-              const index = match[2];
-              const hostMatch = data.url.match(/^(https?:\/\/[^\/]+)/);
-              const host = hostMatch ? hostMatch[1] : 'http://127.0.0.1:8090';
-              const newUrl = host + '/gst/' + hash + '/master.m3u8?index=' + index;
-              console.log('Rewriting TorrServer play URL for GStreamer HLS transcoding:', data.url, '->', newUrl);
-              data.url = newUrl;
+          // Intercept TorrServer stream URLs and rewrite them to use GStreamer HLS transcoding
+          if (data.url && data.url.indexOf('/stream/') !== -1) {
+            var urlObj;
+            try { urlObj = new URL(data.url); } catch(e) { urlObj = null; }
+            if (urlObj) {
+              var hash = urlObj.searchParams.get('link');
+              var index = urlObj.searchParams.get('index') || '0';
+              var host = urlObj.origin || 'http://127.0.0.1:8090';
+              if (hash) {
+                var newUrl = host + '/gst/' + hash + '/master.m3u8?index=' + index;
+                console.log('Rewriting TorrServer URL for GStreamer HLS transcoding:', data.url, '->', newUrl);
+                data.url = newUrl;
+              }
             }
           }
           // Play using native Lampa player

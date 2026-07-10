@@ -90,15 +90,17 @@ class Plugin:
             env.pop(key, None)
         
         # Set environment variables required for graphical applications and audio
+        user_home = get_user_home()
+        uid = os.stat(user_home).st_uid if os.path.isdir(user_home) else 1000
+        xdg_runtime = f"/run/user/{uid}"
         env["DISPLAY"] = ":0"
         env["WAYLAND_DISPLAY"] = "wayland-0"
-        env["XDG_RUNTIME_DIR"] = "/run/user/1000"
-        env["HOME"] = "/home/deck"
-        env["USER"] = "deck"
-        env["DBUS_SESSION_BUS_ADDRESS"] = "unix:path=/run/user/1000/bus"
-        env["PULSE_SERVER"] = "unix:/run/user/1000/pulse/native"
-        env["PULSE_COOKIE"] = "/home/deck/.config/pulse/cookie"
-        env["PIPEWIRE_RUNTIME_DIR"] = "/run/user/1000"
+        env["XDG_RUNTIME_DIR"] = xdg_runtime
+        env["HOME"] = user_home
+        env["DBUS_SESSION_BUS_ADDRESS"] = f"unix:path={xdg_runtime}/bus"
+        env["PULSE_SERVER"] = f"unix:{xdg_runtime}/pulse/native"
+        env["PULSE_COOKIE"] = os.path.join(user_home, ".config", "pulse", "cookie")
+        env["PIPEWIRE_RUNTIME_DIR"] = xdg_runtime
         
         cmd_parts = player_path.split()
         cmd_parts.append(video_url)
@@ -177,7 +179,7 @@ class Plugin:
             plugin_bin_dir = os.path.join(self.plugin_dir, "bin")
             env["PATH"] = f"{plugin_bin_dir}:{env.get('PATH', '')}"
 
-            log_dir = "/home/deck/homebrew/logs/lampa-deck"
+            log_dir = os.path.join(get_user_home(), "homebrew", "logs", "lampa-deck")
             os.makedirs(log_dir, exist_ok=True)
             log_file_path = os.path.join(log_dir, "torrserver.log")
             
@@ -207,7 +209,7 @@ class Plugin:
 
     # Wait and optimize settings
     def wait_and_optimize_torrserver(self):
-        time.sleep(3) # Wait for startup
+        time.sleep(5) # Wait for startup
         url = f"http://127.0.0.1:{self.port_torrserver}/settings"
         
         payload = {
@@ -232,6 +234,37 @@ class Plugin:
                 decky.logger.info(f"TorrServer optimized settings updated successfully: {res_data}")
         except Exception as e:
             decky.logger.warning(f"TorrServer settings optimization failed: {e}")
+
+        # Configure GStreamer transcoding settings for HLS playback in Steam browser
+        gst_url = f"http://127.0.0.1:{self.port_torrserver}/gst/settings"
+        gst_payload = {
+            "enabled": True,
+            "transcode_h264": True,
+            "transcode_h265": True,
+            "transcode_audio": True,
+            "audio_codec": "aac",
+            "video_bitrate": 8000,
+            "audio_bitrate": 192,
+            "segment_duration": 4,
+            "threads": 4
+        }
+        try:
+            gst_data = json.dumps(gst_payload).encode('utf-8')
+            gst_req = urllib.request.Request(gst_url, data=gst_data, headers={'Content-Type': 'application/json'}, method='POST')
+            with urllib.request.urlopen(gst_req, timeout=5) as gst_response:
+                gst_res_data = gst_response.read().decode('utf-8')
+                decky.logger.info(f"TorrServer GStreamer settings configured: {gst_res_data}")
+        except Exception as e:
+            decky.logger.warning(f"TorrServer GStreamer settings configuration failed (may not be -gst build): {e}")
+
+        # Verify GStreamer is available
+        try:
+            echo_req = urllib.request.Request(f"http://127.0.0.1:{self.port_torrserver}/gst/echo")
+            with urllib.request.urlopen(echo_req, timeout=3) as echo_resp:
+                echo_data = echo_resp.read().decode('utf-8')
+                decky.logger.info(f"TorrServer GStreamer echo response: {echo_data}")
+        except Exception as e:
+            decky.logger.warning(f"TorrServer GStreamer echo check failed: {e}")
 
     # Stops TorrServer
     def stop_torrserver(self):
