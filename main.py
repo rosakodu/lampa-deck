@@ -217,7 +217,10 @@ class Plugin:
                 "ReaderReadAHead": 95,
                 "PreloadCache": 25,
                 "UseDisk": False,
-                "ConnectionsLimit": 150
+                "ConnectionsLimit": 150,
+                "TorrentDisconnectTimeout": 90,
+                "ForceEncrypt": True,
+                "EnableIPv6": True
             }
         }
         
