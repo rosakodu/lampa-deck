@@ -129,7 +129,7 @@ class Plugin:
 
     # Download TorrServer helper
     def download_torrserver_binary(self, bin_path):
-        url = "https://github.com/YouROK/TorrServer/releases/latest/download/TorrServer-linux-amd64"
+        url = "https://github.com/YouROK/TorrServer/releases/latest/download/TorrServer-gst-linux-amd64"
         decky.logger.info(f"Downloading TorrServer binary from {url} to {bin_path}...")
         os.makedirs(os.path.dirname(bin_path), exist_ok=True)
         
@@ -151,7 +151,7 @@ class Plugin:
     # Starts local TorrServer (asynchronous helper)
     def start_torrserver_thread(self):
         bin_dir = os.path.join(self.settings_dir, "bin")
-        bin_path = os.path.join(bin_dir, "TorrServer")
+        bin_path = os.path.join(bin_dir, "TorrServer-gst")
         db_path = os.path.join(self.settings_dir, "torrserver")
 
         if not os.path.exists(bin_path):
