@@ -72,7 +72,8 @@
             });
         } else {
           // Intercept TorrServer stream URLs and rewrite them to use GStreamer HLS transcoding
-          if (data.url && data.url.indexOf('/stream/') !== -1) {
+          // Note: Lampa generates /stream?link=HASH&index=0 (no trailing slash after 'stream')
+          if (data.url && data.url.indexOf('/stream') !== -1 && data.url.indexOf('127.0.0.1:8090') !== -1) {
             var urlObj;
             try { urlObj = new URL(data.url); } catch(e) { urlObj = null; }
             if (urlObj) {
@@ -80,6 +81,10 @@
               var index = urlObj.searchParams.get('index') || '0';
               var host = urlObj.origin || 'http://127.0.0.1:8090';
               if (hash) {
+                // Preload the torrent so data starts downloading before GST pipeline starts
+                var preloadUrl = host + '/stream?link=' + hash + '&index=' + index + '&preload';
+                fetch(preloadUrl).catch(function(){});
+                
                 var newUrl = host + '/gst/' + hash + '/master.m3u8?index=' + index;
                 console.log('Rewriting TorrServer URL for GStreamer HLS transcoding:', data.url, '->', newUrl);
                 data.url = newUrl;

@@ -207,7 +207,7 @@ class Plugin:
 
     # Wait and optimize settings
     def wait_and_optimize_torrserver(self):
-        time.sleep(3) # Wait for startup
+        time.sleep(5) # Wait longer for TorrServer-gst to fully initialize
         url = f"http://127.0.0.1:{self.port_torrserver}/settings"
         
         payload = {
@@ -232,6 +232,31 @@ class Plugin:
                 decky.logger.info(f"TorrServer optimized settings updated successfully: {res_data}")
         except Exception as e:
             decky.logger.warning(f"TorrServer settings optimization failed: {e}")
+
+        # Configure GStreamer settings (only available in -gst build)
+        gst_url = f"http://127.0.0.1:{self.port_torrserver}/gst/settings"
+        gst_payload = {
+            "action": "set",
+            "config": {
+                "GSTVersion": 1.22,
+                "Source": "stream",
+                "TranscodeH265": True,   # Transcode HEVC for browser compatibility
+                "TranscodeAV1": True,    # Transcode AV1 for browser compatibility
+                "TranscodeH264": False,  # H264 plays natively in browser
+                "AACBitrateKbps": 256,
+                "SegmentSeconds": 4,     # Shorter segments = faster start
+                "InactiveMinutes": 10
+            }
+        }
+        try:
+            gst_data = json.dumps(gst_payload).encode('utf-8')
+            gst_req = urllib.request.Request(gst_url, data=gst_data, headers={'Content-Type': 'application/json'})
+            with urllib.request.urlopen(gst_req, timeout=5) as gst_response:
+                gst_res = gst_response.read().decode('utf-8')
+                decky.logger.info(f"TorrServer GST settings updated: {gst_res}")
+        except Exception as e:
+            decky.logger.info(f"TorrServer GST settings not available (standard build or not yet ready): {e}")
+
 
     # Stops TorrServer
     def stop_torrserver(self):
