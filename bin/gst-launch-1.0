@@ -1,2 +1,2 @@
 #!/bin/bash
-exec flatpak run --command=gst-launch-1.0 org.videolan.VLC "$@"
+exec sudo -u deck XDG_RUNTIME_DIR=/run/user/1000 flatpak run --command=gst-launch-1.0 org.videolan.VLC "$@"
