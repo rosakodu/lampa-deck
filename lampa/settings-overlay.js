@@ -2,15 +2,15 @@
   // Guarantee platform setting is stored
   window.localStorage.setItem('platform', 'electron');
 
-  // Set default player settings to 'other' (external) if they don't exist yet
+  // Set default player settings to 'inner' (built-in) if they don't exist yet
   if (!window.localStorage.getItem('player')) {
-    window.localStorage.setItem('player', 'other');
+    window.localStorage.setItem('player', 'inner');
   }
   if (!window.localStorage.getItem('player_torrent')) {
-    window.localStorage.setItem('player_torrent', 'other');
+    window.localStorage.setItem('player_torrent', 'inner');
   }
   if (!window.localStorage.getItem('player_iptv')) {
-    window.localStorage.setItem('player_iptv', 'other');
+    window.localStorage.setItem('player_iptv', 'inner');
   }
 
   // Set default player path to VLC Flatpak for Steam Deck (since VLC is now the absolute default)
