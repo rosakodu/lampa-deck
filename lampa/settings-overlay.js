@@ -16,29 +16,28 @@
     window.localStorage.setItem('player_nw_path', 'flatpak run org.videolan.VLC');
   }
 
-  // Set default TorrServer URLs so Lampa connects to the local TorrServer instance
-  if (!window.localStorage.getItem('torrserver_url')) {
+  // Force default Lampa configuration and plugins once on this version upgrade
+  if (window.localStorage.getItem('settings_v1_reset') !== 'true') {
+    // Connect to local TorrServer
     window.localStorage.setItem('torrserver_url', 'http://127.0.0.1:8090');
-  }
-  if (!window.localStorage.getItem('torrserver_url_two')) {
     window.localStorage.setItem('torrserver_url_two', 'http://127.0.0.1:8090');
-  }
-  if (!window.localStorage.getItem('torrserver_use_link')) {
     window.localStorage.setItem('torrserver_use_link', 'one');
-  }
 
-  // Enable Lampa's built-in torrent parser setting
-  if (window.localStorage.getItem('parser_use') === null) {
+    // Pre-configure the Jackett parser using the public jacred.ru proxy
     window.localStorage.setItem('parser_use', 'true');
-  }
+    window.localStorage.setItem('parser_torrent_type', 'jackett');
+    window.localStorage.setItem('parser_jackett_url', 'https://jacred.ru/');
 
-  // Pre-load standard plugins (TorrServer Parser and VOD Streams) if no plugins are configured yet
-  if (!window.localStorage.getItem('plugins')) {
+    // Install critical plugins: TMDB proxy (bypasses blocks), etor (torrents), and online mod
     const defaultPlugins = [
+      { url: 'https://plugin.rootu.top/tmdb.js', status: 1 },
       { url: 'http://cub.red/plugin/etor', status: 1 },
-      { url: 'https://nb557.github.io/plugins/online_mod.js', status: 1 }
+      { url: 'https://nb557.github.io/plugins/online_mod.js', status: 1 },
+      { url: 'https://bylampa.github.io/jackett.js', status: 1 }
     ];
     window.localStorage.setItem('plugins', JSON.stringify(defaultPlugins));
+    
+    window.localStorage.setItem('settings_v1_reset', 'true');
   }
 
   let originalPlay = null;
