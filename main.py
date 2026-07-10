@@ -81,31 +81,47 @@ class Plugin:
     # Spawns VLC or other external player
     def sync_play_video(self, url: str, player_path: str) -> bool:
         decky.logger.info(f"Sync play request: player='{player_path}', url='{url}'")
+        
+        video_url = url.replace('&preload', '&play')
+        
+        # Build environment for host execution
         env = os.environ.copy()
         for key in ["LD_LIBRARY_PATH", "LD_PRELOAD", "APPDIR", "APPIMAGE"]:
-            if key in env:
-                del env[key]
-
-        # Inject graphical environment variables so VLC flatpak can access the display server
+            env.pop(key, None)
+        
+        # Set environment variables required for graphical applications
         env["DISPLAY"] = ":0"
         env["WAYLAND_DISPLAY"] = "wayland-0"
         env["XDG_RUNTIME_DIR"] = "/run/user/1000"
-
-        video_url = url.replace('&preload', '&play')
-        cmd_parts = player_path.split(' ') if ' ' in player_path else [player_path]
+        env["HOME"] = "/home/deck"
+        env["USER"] = "deck"
+        env["DBUS_SESSION_BUS_ADDRESS"] = "unix:path=/run/user/1000/bus"
         
-        # If running as root, switch execution context to the standard deck user
-        if os.geteuid() == 0:
-            user = getattr(decky, "DECKY_USER", "deck")
-            cmd_parts = ["sudo", "-u", user] + cmd_parts
-            
+        cmd_parts = player_path.split()
         cmd_parts.append(video_url)
-
+        
+        decky.logger.info(f"Launching player command: {' '.join(cmd_parts)}")
+        
         try:
-            subprocess.Popen(cmd_parts, env=env, start_new_session=True)
+            proc = subprocess.Popen(
+                cmd_parts,
+                env=env,
+                start_new_session=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+            )
+            # Wait briefly to catch immediate failures
+            try:
+                stdout, stderr = proc.communicate(timeout=2)
+                if proc.returncode is not None and proc.returncode != 0:
+                    decky.logger.error(f"Player exited with code {proc.returncode}, stderr: {stderr.decode(errors='replace')}")
+                    return False
+            except subprocess.TimeoutExpired:
+                # Process is still running (good — means the player started)
+                decky.logger.info("Player process started successfully (still running)")
             return True
         except Exception as e:
-            decky.logger.error(f"Failed to spawn player synchronously: {e}")
+            decky.logger.error(f"Failed to spawn player: {e}")
             return False
 
     # Download TorrServer helper
