@@ -164,6 +164,13 @@ class Plugin:
         if not os.path.exists(db_path):
             os.makedirs(db_path, exist_ok=True)
 
+        # Clean up any stale TorrServer processes to prevent port/DB lock conflicts
+        try:
+            subprocess.run(["killall", "-9", "TorrServer", "TorrServer-gst"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            time.sleep(0.5)
+        except Exception as ke:
+            decky.logger.warning(f"Failed to kill stale TorrServer processes: {ke}")
+
         decky.logger.info(f"Starting TorrServer binary at {bin_path} on port {self.port_torrserver}...")
         try:
             env = os.environ.copy()
