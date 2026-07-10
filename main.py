@@ -166,11 +166,15 @@ class Plugin:
 
         decky.logger.info(f"Starting TorrServer binary at {bin_path} on port {self.port_torrserver}...")
         try:
+            env = os.environ.copy()
+            plugin_bin_dir = os.path.join(self.plugin_dir, "bin")
+            env["PATH"] = f"{plugin_bin_dir}:{env.get('PATH', '')}"
+
             self.torrserver_process = subprocess.Popen([
                 bin_path,
                 "-p", str(self.port_torrserver),
                 "-d", db_path
-            ], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, start_new_session=True)
+            ], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, start_new_session=True, env=env)
             
             # Start optimization task
             threading.Thread(target=self.wait_and_optimize_torrserver, daemon=True).start()
