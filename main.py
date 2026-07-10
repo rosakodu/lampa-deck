@@ -219,8 +219,8 @@ class Plugin:
                 "UseDisk": False,
                 "ConnectionsLimit": 150,
                 "TorrentDisconnectTimeout": 90,
-                "ForceEncrypt": True,
-                "EnableIPv6": True
+                "ForceEncrypt": False,
+                "EnableIPv6": False
             }
         }
         
