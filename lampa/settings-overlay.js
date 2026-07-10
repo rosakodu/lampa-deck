@@ -1,6 +1,9 @@
 (function() {
   // Guarantee platform setting is stored
   window.localStorage.setItem('platform', 'electron');
+  // Force disable GStreamer HLS mode - /gst/ endpoint fails with 502 on cold start
+  // Lampa auto-enables this if /gst/echo responds, but it causes manifestLoadError
+  window.localStorage.setItem('torrserver_gts', 'false');
 
   // Force default player settings to 'inner' (built-in) once on this version upgrade
   if (window.localStorage.getItem('player_v1_reset') !== 'true') {
@@ -22,6 +25,8 @@
     window.localStorage.setItem('torrserver_url', 'http://127.0.0.1:8090');
     window.localStorage.setItem('torrserver_url_two', 'http://127.0.0.1:8090');
     window.localStorage.setItem('torrserver_use_link', 'one');
+    // Disable GStreamer HLS endpoint - /gst/ fails with 502 until file is partially downloaded
+    window.localStorage.setItem('torrserver_gts', 'false');
 
     // Pre-configure the Jackett parser using the public jacred.ru proxy
     window.localStorage.setItem('parser_use', 'true');
