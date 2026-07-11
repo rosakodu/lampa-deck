@@ -1,8 +1,8 @@
 (function() {
   // Guarantee platform setting is stored
   window.localStorage.setItem('platform', 'electron');
-  // Force disable GStreamer HLS mode - /gst/ endpoint fails with 502 on cold start
-  // Lampa auto-enables this if /gst/echo responds, but it causes manifestLoadError
+  // Keep torrserver_gts=false — we handle GST manually with proper preload timing
+  // (Lampa's auto-GST fires immediately without waiting for data → 502 error)
   window.localStorage.setItem('torrserver_gts', 'false');
 
   // Force default player settings to 'inner' (built-in) once on this version upgrade
@@ -13,71 +13,153 @@
     window.localStorage.setItem('player_v1_reset', 'true');
   }
 
-  // Set default player path to VLC Flatpak for Steam Deck (since VLC is now the absolute default)
-  const currentPath = window.localStorage.getItem('player_nw_path');
-  if (!currentPath || currentPath.includes('.exe') || currentPath.includes(':/') || currentPath.includes(':\\') || currentPath === '/usr/bin/mpv') {
+  // Set default player path to VLC Flatpak for Steam Deck
+  var currentPath = window.localStorage.getItem('player_nw_path');
+  if (!currentPath || currentPath.includes('.exe') || currentPath.includes(':/') || currentPath.includes(':\\\\') || currentPath === '/usr/bin/mpv') {
     window.localStorage.setItem('player_nw_path', 'flatpak run org.videolan.VLC');
   }
 
-  // Force default Lampa configuration and plugins once on this version upgrade
+  // Force default Lampa configuration and plugins once on first install
   if (window.localStorage.getItem('settings_v1_reset') !== 'true') {
-    // Connect to local TorrServer
     window.localStorage.setItem('torrserver_url', 'http://127.0.0.1:8090');
     window.localStorage.setItem('torrserver_url_two', 'http://127.0.0.1:8090');
     window.localStorage.setItem('torrserver_use_link', 'one');
-    // Disable GStreamer HLS endpoint - /gst/ fails with 502 until file is partially downloaded
-    window.localStorage.setItem('torrserver_gts', 'false');
 
-    // Pre-configure the Jackett parser using the public jacred.ru proxy
     window.localStorage.setItem('parser_use', 'true');
     window.localStorage.setItem('parser_torrent_type', 'jackett');
     window.localStorage.setItem('parser_jackett_url', 'https://jacred.ru/');
 
-    // Install critical plugins: TMDB proxy (bypasses blocks), etor (torrents), and online mod
-    const defaultPlugins = [
+    var defaultPlugins = [
       { url: 'https://plugin.rootu.top/tmdb.js', status: 1 },
       { url: 'http://cub.red/plugin/etor', status: 1 },
       { url: 'https://nb557.github.io/plugins/online_mod.js', status: 1 },
       { url: 'https://bylampa.github.io/jackett.js', status: 1 }
     ];
     window.localStorage.setItem('plugins', JSON.stringify(defaultPlugins));
-    
     window.localStorage.setItem('settings_v1_reset', 'true');
   }
 
-  let originalPlay = null;
+  var originalPlay = null;
+
+  // Extract torrent hash and file index from a TorrServer /stream/ URL
+  function parseTorrServerUrl(url) {
+    try {
+      var u = new URL(url);
+      if (u.hostname !== '127.0.0.1' || u.port !== '8090') return null;
+      if (u.pathname.indexOf('/stream') === -1) return null;
+      var hash = u.searchParams.get('link');
+      var index = u.searchParams.get('index') || '0';
+      if (!hash) return null;
+      return { hash: hash, index: index, host: u.origin };
+    } catch(e) { return null; }
+  }
+
+  // Try to play via /gst/ HLS. If it fails, fall back to /stream/
+  function playWithGst(data, parsed, originalData) {
+    var gstUrl = parsed.host + '/gst/' + parsed.hash + '/master.m3u8?index=' + parsed.index + '&audio=0';
+    // Quick probe: check if /gst/ is ready
+    fetch(parsed.host + '/gst/' + parsed.hash + '/probe?index=' + parsed.index)
+      .then(function(r) {
+        if (r.ok) {
+          console.log('[lampa-deck] GST probe OK, playing via HLS:', gstUrl);
+          data.url = gstUrl;
+          originalPlay.call(window.Lampa.Player, data);
+        } else {
+          console.log('[lampa-deck] GST probe failed (' + r.status + '), using /stream/ fallback');
+          originalPlay.call(window.Lampa.Player, originalData);
+        }
+      })
+      .catch(function() {
+        console.log('[lampa-deck] GST probe error, using /stream/ fallback');
+        originalPlay.call(window.Lampa.Player, originalData);
+      });
+  }
+
+  // Preload torrent data, then try GST transcoding
+  function preloadAndPlay(data) {
+    var parsed = parseTorrServerUrl(data.url);
+    if (!parsed) {
+      originalPlay.call(window.Lampa.Player, data);
+      return;
+    }
+
+    // Save original data (with /stream/ URL)
+    var originalData = JSON.parse(JSON.stringify(data));
+
+    console.log('[lampa-deck] Preloading torrent before GST playback...');
+    if (window.Lampa && window.Lampa.Noty) {
+      window.Lampa.Noty.show('Буферизация...');
+    }
+
+    // Start preload
+    var preloadUrl = parsed.host + '/stream?link=' + parsed.hash + '&index=' + parsed.index + '&preload';
+    fetch(preloadUrl).catch(function(){});
+
+    // Poll torrent stat until we have some data downloaded (max 15 sec)
+    var attempts = 0;
+    var maxAttempts = 30; // 30 * 500ms = 15 sec
+
+    function checkAndPlay() {
+      attempts++;
+      fetch(parsed.host + '/torrents', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({action: 'get', hash: parsed.hash})
+      })
+      .then(function(r) { return r.json(); })
+      .then(function(stat) {
+        var loaded = stat.preloaded_bytes || stat.bytes_read_useful_data || 0;
+        var preloadSize = stat.preload_size || 10000000; // default 10MB
+        var progress = preloadSize > 0 ? (loaded / preloadSize * 100) : 0;
+        console.log('[lampa-deck] Preload progress: ' + loaded + ' / ' + preloadSize + ' (' + progress.toFixed(1) + '%)');
+
+        // Need at least 3MB or 5% preloaded for gst-discoverer to work
+        if (loaded >= 3145728 || progress >= 5 || attempts >= maxAttempts) {
+          if (attempts >= maxAttempts) {
+            console.log('[lampa-deck] Preload timeout - trying /stream/ directly');
+            originalPlay.call(window.Lampa.Player, originalData);
+          } else {
+            console.log('[lampa-deck] Preload ready (' + loaded + ' bytes), starting GST');
+            playWithGst(data, parsed, originalData);
+          }
+        } else {
+          setTimeout(checkAndPlay, 500);
+        }
+      })
+      .catch(function() {
+        // If stat fails, just try playing
+        originalPlay.call(window.Lampa.Player, originalData);
+      });
+    }
+
+    // Start checking after initial 1 second
+    setTimeout(checkAndPlay, 1000);
+  }
 
   // Wait for Lampa object to become available
   function initLampaHook() {
     if (window.Lampa && window.Lampa.Player && window.Lampa.Storage) {
-      console.log('Lampa object found! Hooking video player for Decky Loader iframe...');
+      console.log('[lampa-deck] Lampa found, hooking player...');
       originalPlay = window.Lampa.Player.play;
-      
-      // Override Player.play
+
       window.Lampa.Player.play = function(data) {
-        const need = data.torrent_hash ? 'torrent' : '';
-        const playerNeed = 'player' + (need ? '_' + need : '');
-        const playerType = window.Lampa.Storage.get(playerNeed) || window.Lampa.Storage.field(playerNeed) || 'inner';
-        
+        var need = data.torrent_hash ? 'torrent' : '';
+        var playerNeed = 'player' + (need ? '_' + need : '');
+        var playerType = window.Lampa.Storage.get(playerNeed) || window.Lampa.Storage.field(playerNeed) || 'inner';
+
         if (playerType === 'other' || playerType === 'vlc' || playerType === 'mpc') {
-          // Read native player path from Lampa settings
-          const playerPath = window.Lampa.Storage.get('player_nw_path') || window.Lampa.Storage.field('player_nw_path') || 'flatpak run org.videolan.VLC';
-          
-          console.log('Redirecting playback to Decky backend via postMessage:', playerType, playerPath, data.url);
-          
-          if (window.Lampa.Noty) {
-            window.Lampa.Noty.show('Запуск внешнего плеера (' + playerType.toUpperCase() + ')...');
-          }
-          
-          // Send request to the Python backend HTTP server play endpoint
-          console.log('Sending play request to Python backend:', playerType, playerPath, data.url);
+          var playerPath = window.Lampa.Storage.get('player_nw_path') || 'flatpak run org.videolan.VLC';
+          if (window.Lampa.Noty) window.Lampa.Noty.show('Запуск VLC...');
           fetch('/play?url=' + encodeURIComponent(data.url) + '&player=' + encodeURIComponent(playerPath))
-            .catch(function(err) {
-              console.error('Failed to trigger play on backend:', err);
-            });
+            .catch(function(err) { console.error('[lampa-deck] Play fetch error:', err); });
         } else {
-          // Play using native Lampa player (standard /stream/ endpoint)
-          originalPlay.call(window.Lampa.Player, data);
+          // Check if it's a TorrServer /stream/ URL → use GST transcoding with preload
+          var parsed = parseTorrServerUrl(data.url);
+          if (parsed) {
+            preloadAndPlay(data);
+          } else {
+            originalPlay.call(window.Lampa.Player, data);
+          }
         }
       };
     } else {
@@ -85,6 +167,5 @@
     }
   }
 
-  // Initialize hook
   initLampaHook();
 })();

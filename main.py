@@ -190,11 +190,38 @@ class Plugin:
                 stdout_val = subprocess.DEVNULL
                 stderr_val = subprocess.DEVNULL
 
-            self.torrserver_process = subprocess.Popen([
+            cmd = [
                 bin_path,
                 "-p", str(self.port_torrserver),
                 "-d", db_path
-            ], stdout=stdout_val, stderr=stderr_val, start_new_session=True, env=env)
+            ]
+            
+            # Check if VLC flatpak is installed
+            has_vlc = False
+            try:
+                res = subprocess.run(["sudo", "-u", "deck", "flatpak", "info", "org.videolan.VLC"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                has_vlc = (res.returncode == 0)
+            except Exception:
+                pass
+                
+            if has_vlc:
+                decky.logger.info("Starting TorrServer inside VLC Flatpak for GStreamer dependencies")
+                cmd = [
+                    "sudo", "-E", "-u", "deck", "env", "XDG_RUNTIME_DIR=/run/user/1000",
+                    "flatpak", "run", "--filesystem=host", "--share=network", 
+                    "--command=bash", "org.videolan.VLC", "-c",
+                    " ".join(f"'{c}'" for c in cmd)
+                ]
+            else:
+                decky.logger.warning("VLC Flatpak not found. TorrServer GStreamer transcoding may fail.")
+
+            self.torrserver_process = subprocess.Popen(
+                cmd, 
+                stdout=stdout_val, 
+                stderr=stderr_val, 
+                start_new_session=True, 
+                env=env
+            )
             
             # Start optimization task
             threading.Thread(target=self.wait_and_optimize_torrserver, daemon=True).start()
