@@ -280,5 +280,112 @@
     }
   }
 
+  // Gamepad to Keyboard Event Mapper for Steam Deck controller support
+  function initGamepadMapper() {
+    var buttonStates = {};
+    var axisStates = { x: 0, y: 0 };
+    var KEY_MAP = {
+      12: { code: 'ArrowUp', key: 'ArrowUp', keyCode: 38 },     // D-Pad Up
+      13: { code: 'ArrowDown', key: 'ArrowDown', keyCode: 40 }, // D-Pad Down
+      14: { code: 'ArrowLeft', key: 'ArrowLeft', keyCode: 37 }, // D-Pad Left
+      15: { code: 'ArrowRight', key: 'ArrowRight', keyCode: 39 }, // D-Pad Right
+      0: { code: 'Enter', key: 'Enter', keyCode: 13 },          // Button A (Select)
+      1: { code: 'Escape', key: 'Escape', keyCode: 27 }          // Button B (Back)
+    };
+
+    function triggerKeyEvent(type, mapping) {
+      var event = new KeyboardEvent(type, {
+        code: mapping.code,
+        key: mapping.key,
+        keyCode: mapping.keyCode,
+        which: mapping.keyCode,
+        bubbles: true,
+        cancelable: true
+      });
+      document.dispatchEvent(event);
+      if (window.Lampa && window.Lampa.Keypad && type === 'keydown') {
+        try {
+          window.Lampa.Keypad.listener(event);
+        } catch (e) {}
+      }
+    }
+
+    function updateGamepads() {
+      var gamepads = navigator.getGamepads ? navigator.getGamepads() : [];
+      var gp = null;
+      for (var i = 0; i < gamepads.length; i++) {
+        if (gamepads[i]) { gp = gamepads[i]; break; }
+      }
+
+      if (!gp) {
+        requestAnimationFrame(updateGamepads);
+        return;
+      }
+
+      // Check buttons
+      Object.keys(KEY_MAP).forEach(function(btnIndex) {
+        var button = gp.buttons[btnIndex];
+        var pressed = button ? button.pressed : false;
+        var prevState = buttonStates[btnIndex] || false;
+
+        if (pressed && !prevState) {
+          triggerKeyEvent('keydown', KEY_MAP[btnIndex]);
+        } else if (!pressed && prevState) {
+          triggerKeyEvent('keyup', KEY_MAP[btnIndex]);
+        }
+        buttonStates[btnIndex] = pressed;
+      });
+
+      // Check Left Stick axes
+      var threshold = 0.5;
+      var stickX = gp.axes[0] || 0;
+      var stickY = gp.axes[1] || 0;
+
+      // X Axis
+      var currX = 0;
+      if (stickX < -threshold) currX = -1;
+      else if (stickX > threshold) currX = 1;
+
+      if (currX !== axisStates.x) {
+        if (currX === -1) triggerKeyEvent('keydown', KEY_MAP[14]); // ArrowLeft
+        if (currX === 1) triggerKeyEvent('keydown', KEY_MAP[15]);  // ArrowRight
+        if (axisStates.x === -1 && currX === 0) triggerKeyEvent('keyup', KEY_MAP[14]);
+        if (axisStates.x === 1 && currX === 0) triggerKeyEvent('keyup', KEY_MAP[15]);
+        axisStates.x = currX;
+      }
+
+      // Y Axis
+      var currY = 0;
+      if (stickY < -threshold) currY = -1;
+      else if (stickY > threshold) currY = 1;
+
+      if (currY !== axisStates.y) {
+        if (currY === -1) triggerKeyEvent('keydown', KEY_MAP[12]); // ArrowUp
+        if (currY === 1) triggerKeyEvent('keydown', KEY_MAP[13]);  // ArrowDown
+        if (axisStates.y === -1 && currY === 0) triggerKeyEvent('keyup', KEY_MAP[12]);
+        if (axisStates.y === 1 && currY === 0) triggerKeyEvent('keyup', KEY_MAP[13]);
+        axisStates.y = currY;
+      }
+
+      requestAnimationFrame(updateGamepads);
+    }
+
+    // Auto-focus body to ensure keyboard focus
+    document.addEventListener('DOMContentLoaded', function() {
+      document.body.focus();
+    });
+    window.addEventListener('focus', function() {
+      document.body.focus();
+    });
+    
+    requestAnimationFrame(updateGamepads);
+  }
+
+  try {
+    initGamepadMapper();
+  } catch (e) {
+    console.error('[lampa-deck] Failed to init Gamepad Mapper:', e);
+  }
+
   initLampaHook();
 })();
