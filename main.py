@@ -508,19 +508,8 @@ class Plugin:
         decky.logger.info("Steam language not found, defaulting to english")
         return "english"
 
-    # Exposes function to open Lampa in Steam native browser
-    async def open_lampa(self) -> bool:
-        decky.logger.info("Opening Lampa in Steam native browser...")
-        try:
-            # We use xdg-open to trigger steam://openurl/http://127.0.0.1:8000
-            subprocess.Popen(["xdg-open", f"steam://openurl/http://127.0.0.1:{self.port_lampa}"], start_new_session=True)
-            return True
-        except Exception as e:
-            decky.logger.error(f"Failed to open Lampa in Steam browser: {e}")
-            return False
-
-    # Exposes function to resume last visited Lampa page
-    async def open_last_lampa(self) -> bool:
+    # Exposes function to get last visited Lampa page URL
+    async def get_last_url(self) -> str:
         url = f"http://127.0.0.1:{self.port_lampa}"
         last_url_path = os.path.join(self.settings_dir, "last_url.txt")
         if os.path.exists(last_url_path):
@@ -531,14 +520,7 @@ class Plugin:
                         url = saved
             except Exception:
                 pass
-        
-        decky.logger.info(f"Resuming Lampa page: {url}")
-        try:
-            subprocess.Popen(["xdg-open", f"steam://openurl/{url}"], start_new_session=True)
-            return True
-        except Exception as e:
-            decky.logger.error(f"Failed to resume Lampa page: {e}")
-            return False
+        return url
 
     # Spawns VLC or other external player
     def sync_play_video(self, url: str, player_path: str) -> bool:

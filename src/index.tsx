@@ -17,8 +17,7 @@ import { FaFilm } from "react-icons/fa";
 // Python backend callables
 const getTorrserverStatus = callable<[], boolean>("get_torrserver_status");
 const restartTorrserver = callable<[], boolean>("restart_torrserver");
-const openLampa = callable<[], boolean>("open_lampa");
-const openLastLampa = callable<[], boolean>("open_last_lampa");
+const getLastUrl = callable<[], string>("get_last_url");
 const stopAll = callable<[], boolean>("stop_all");
 const clearCache = callable<[], boolean>("clear_cache");
 const getSteamLanguage = callable<[], string>("get_steam_language");
@@ -234,7 +233,7 @@ function Content() {
   const handleOpenLampa = async () => {
     try {
       Router.CloseSideMenus();
-      await openLampa();
+      Navigation.NavigateToExternalWeb("http://127.0.0.1:8000");
     } catch (e) {
       console.error(e);
       toaster.toast({
@@ -247,7 +246,9 @@ function Content() {
   const handleOpenLastLampa = async () => {
     try {
       Router.CloseSideMenus();
-      await openLastLampa();
+      const rawUrl = await getLastUrl();
+      const url = (rawUrl as any)?.result ?? rawUrl ?? "http://127.0.0.1:8000";
+      Navigation.NavigateToExternalWeb(url);
     } catch (e) {
       console.error(e);
       toaster.toast({
