@@ -8,7 +8,7 @@ Steam Deck için Lampa kataloğunu ve medya oynatıcısını, TorrServer-gst'yi 
 
 ## 📋 Özellikler
 
-- **Yerleşik Lampa**: Lampa katalog statik dosyalarını yerel olarak 8000 portunda sunar.
+- **Yerleşik Lampa**: Lampa katalog statik dosyalarını yerel olarak 8300 portunda sunar.
 - **Entegre TorrServer**: Torrent akışlarını yerel olarak 8090 portunda işlemek için TorrServer-gst'yi otomatik olarak indirir ve başlatır.
 - **Anında HLS VP9 Kodlama**: SteamOS tarayıcısıyla uyumlu olmayan ses/video formatlarını (H.265/HEVC, AV1, AC-3) yerel oynatma için anında fMP4 VP9 + AAC formatına dönüştüren yerleşik statik FFmpeg tabanlı arka plan kodlama motoru.
 - **İzlemeye Devam Et**: Lampa'yı en son kaldığınız aktif sayfadan yeniden açmak için tek tıkla çalışan buton.

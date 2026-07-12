@@ -392,7 +392,7 @@ class Plugin:
         self.torrserver_process = None
         self.httpd = None
         self.port_torrserver = 8090
-        self.port_lampa = 8000
+        self.port_lampa = 8300
         
         # Safe directory resolution using environment variables first
         self.plugin_dir = os.environ.get(
@@ -412,7 +412,7 @@ class Plugin:
                 target = next((t for t in targets if 'Lampa' in t.get('title', '')), None)
                 if target and target.get('url'):
                     url = target['url']
-                    if "127.0.0.1:8000" in url:
+                    if "127.0.0.1:8300" in url:
                         last_url_path = os.path.join(self.settings_dir, "last_url.txt")
                         with open(last_url_path, "w") as f:
                             f.write(url)
@@ -516,7 +516,7 @@ class Plugin:
             try:
                 with open(last_url_path, "r") as f:
                     saved = f.read().strip()
-                    if saved.startswith("http://127.0.0.1:8000"):
+                    if saved.startswith("http://127.0.0.1:8300"):
                         url = saved
             except Exception:
                 pass
@@ -768,7 +768,7 @@ class Plugin:
                             f"http://127.0.0.1:{plugin_self.port_torrserver}"
                             f"/stream?link={link}&index={index}&play"
                         )
-                        host = "http://127.0.0.1:8000"
+                        host = f"http://127.0.0.1:{plugin_self.port_lampa}"
                         duration = transcoder.get_duration(torr_url)
                         playlist = transcoder.generate_master_playlist(
                             torr_url, link, duration, index, host=host
@@ -792,7 +792,7 @@ class Plugin:
                             f"http://127.0.0.1:{plugin_self.port_torrserver}"
                             f"/stream?link={link}&index={index}&play"
                         )
-                        host = "http://127.0.0.1:8000"
+                        host = f"http://127.0.0.1:{plugin_self.port_lampa}"
                         duration = transcoder.get_duration(torr_url)
                         playlist = transcoder.generate_media_playlist(
                             torr_url, link, duration, index, host=host

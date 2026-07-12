@@ -233,7 +233,7 @@ function Content() {
   const handleOpenLampa = async () => {
     try {
       Router.CloseSideMenus();
-      Navigation.NavigateToExternalWeb("http://127.0.0.1:8000");
+      Navigation.NavigateToExternalWeb("http://127.0.0.1:8300");
     } catch (e) {
       console.error(e);
       toaster.toast({
@@ -247,7 +247,7 @@ function Content() {
     try {
       Router.CloseSideMenus();
       const rawUrl = await getLastUrl();
-      const url = (rawUrl as any)?.result ?? rawUrl ?? "http://127.0.0.1:8000";
+      const url = (rawUrl as any)?.result ?? rawUrl ?? "http://127.0.0.1:8300";
       Navigation.NavigateToExternalWeb(url);
     } catch (e) {
       console.error(e);

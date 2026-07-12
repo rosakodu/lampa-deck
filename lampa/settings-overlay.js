@@ -191,7 +191,7 @@
             console.log('[lampa-deck] Preload ready (' + loaded + ' bytes), probing codecs...');
             showNoty('Анализ формата...');
 
-            var probeUrl = 'http://127.0.0.1:8000/probe_stream?link=' +
+            var probeUrl = 'http://127.0.0.1:8300/probe_stream?link=' +
               encodeURIComponent(parsed.hash) + '&index=' + encodeURIComponent(parsed.index);
 
             fetch(probeUrl)
@@ -202,7 +202,7 @@
                 if (probeRes && probeRes.transcode === true) {
                   console.log('[lampa-deck] Codecs unsupported → Python HLS transcoder');
                   showNoty('Транскодирование (HLS)...');
-                  data.url = 'http://127.0.0.1:8000/hls/master.m3u8?link=' +
+                  data.url = 'http://127.0.0.1:8300/hls/master.m3u8?link=' +
                     encodeURIComponent(parsed.hash) + '&index=' + encodeURIComponent(parsed.index);
                   // Let Lampa's own hls.js path handle the .m3u8 (no src prototype conflict)
                   originalPlay.call(window.Lampa.Player, data);
@@ -214,7 +214,7 @@
                   // Probe error / unknown → safer to transcode (AVI/mpeg4/AC3 etc.)
                   console.log('[lampa-deck] Probe uncertain, using HLS transcoder:', probeRes);
                   showNoty('Транскодирование (HLS)...');
-                  data.url = 'http://127.0.0.1:8000/hls/master.m3u8?link=' +
+                  data.url = 'http://127.0.0.1:8300/hls/master.m3u8?link=' +
                     encodeURIComponent(parsed.hash) + '&index=' + encodeURIComponent(parsed.index);
                   originalPlay.call(window.Lampa.Player, data);
                 }
@@ -222,7 +222,7 @@
               .catch(function(err) {
                 console.log('[lampa-deck] Probe failed, using HLS transcoder:', err);
                 showNoty('Транскодирование (HLS)...');
-                data.url = 'http://127.0.0.1:8000/hls/master.m3u8?link=' +
+                data.url = 'http://127.0.0.1:8300/hls/master.m3u8?link=' +
                   encodeURIComponent(parsed.hash) + '&index=' + encodeURIComponent(parsed.index);
                 originalPlay.call(window.Lampa.Player, data);
               });
@@ -282,6 +282,13 @@
 
   // Gamepad to Keyboard Event Mapper for Steam Deck controller support
   function initGamepadMapper() {
+    console.log('[lampa-deck] Initializing Gamepad Mapper and Key Logger...');
+    
+    // Diagnostic Key Logger
+    window.addEventListener('keydown', function(e) {
+      console.log('[lampa-deck-input] KeyDown:', e.key, 'code:', e.code, 'keyCode:', e.keyCode, 'isTrusted:', e.isTrusted);
+    }, true);
+
     var buttonStates = {};
     var axisStates = { x: 0, y: 0 };
     var KEY_MAP = {
@@ -290,23 +297,36 @@
       14: { code: 'ArrowLeft', key: 'ArrowLeft', keyCode: 37 }, // D-Pad Left
       15: { code: 'ArrowRight', key: 'ArrowRight', keyCode: 39 }, // D-Pad Right
       0: { code: 'Enter', key: 'Enter', keyCode: 13 },          // Button A (Select)
-      1: { code: 'Escape', key: 'Escape', keyCode: 27 }          // Button B (Back)
+      1: { code: 'Escape', key: 'Escape', keyCode: 27 },         // Button B (Back)
+      9: { code: 'Enter', key: 'Enter', keyCode: 13 }           // Start button (also Enter)
     };
 
     function triggerKeyEvent(type, mapping) {
+      console.log('[lampa-deck] Emulating key event:', type, mapping.key);
       var event = new KeyboardEvent(type, {
         code: mapping.code,
         key: mapping.key,
         keyCode: mapping.keyCode,
         which: mapping.keyCode,
         bubbles: true,
-        cancelable: true
+        cancelable: true,
+        view: window
       });
+      
+      // Define properties that might be read-only in some browsers
+      Object.defineProperty(event, 'keyCode', { value: mapping.keyCode });
+      Object.defineProperty(event, 'which', { value: mapping.keyCode });
+
       document.dispatchEvent(event);
+      window.dispatchEvent(event);
+      
+      // Inject directly into Lampa's Keypad if it exists
       if (window.Lampa && window.Lampa.Keypad && type === 'keydown') {
         try {
           window.Lampa.Keypad.listener(event);
-        } catch (e) {}
+        } catch (e) {
+          console.error('[lampa-deck] Lampa.Keypad error:', e);
+        }
       }
     }
 
@@ -370,14 +390,18 @@
       requestAnimationFrame(updateGamepads);
     }
 
-    // Auto-focus body to ensure keyboard focus
-    document.addEventListener('DOMContentLoaded', function() {
-      document.body.focus();
+    // Force focus to window and document body to ensure focus is not lost
+    setInterval(function() {
+      try {
+        window.focus();
+        document.body.focus();
+      } catch (e) {}
+    }, 1000);
+
+    window.addEventListener('gamepadconnected', function(e) {
+      console.log('[lampa-deck] Gamepad connected:', e.gamepad.id);
     });
-    window.addEventListener('focus', function() {
-      document.body.focus();
-    });
-    
+
     requestAnimationFrame(updateGamepads);
   }
 

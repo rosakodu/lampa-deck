@@ -8,7 +8,7 @@ A Decky Loader plugin for Steam Deck that runs a fully local instance of the **L
 
 ## 📋 Features
 
-- **Built-in Lampa**: Serve static files of Lampa catalog locally on port 8000.
+- **Built-in Lampa**: Serve static files of Lampa catalog locally on port 8300.
 - **Embedded TorrServer**: Automatically downloads and starts TorrServer-gst to handle torrent streams locally on port 8090.
 - **On-the-Fly HLS VP9 Transcoding**: Custom background transcode engine using bundled static FFmpeg to transcode incompatible audio/video formats (like H.265/HEVC, AV1, AC-3) to fMP4 VP9 + AAC on the fly for native SteamOS browser playback.
 - **Resume Viewing**: One-click button to resume your last active Lampa session exactly where you left off.
