@@ -14,6 +14,7 @@ import decky
 import ssl
 import glob
 import signal
+import re
 
 # Insert plugin folder to sys.path
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -403,8 +404,26 @@ class Plugin:
             os.path.join(get_user_home(), ".config", "lampa-deck")
         )
 
+    def _save_last_url(self):
+        try:
+            req = urllib.request.Request("http://127.0.0.1:8080/json")
+            with urllib.request.urlopen(req, timeout=1.0) as response:
+                targets = json.loads(response.read().decode())
+                target = next((t for t in targets if 'Lampa' in t.get('title', '')), None)
+                if target and target.get('url'):
+                    url = target['url']
+                    if "127.0.0.1:8000" in url:
+                        last_url_path = os.path.join(self.settings_dir, "last_url.txt")
+                        with open(last_url_path, "w") as f:
+                            f.write(url)
+        except Exception:
+            pass
+
     # Exposes TorrServer running status
     async def get_torrserver_status(self) -> bool:
+        # Trigger background last URL saving
+        threading.Thread(target=self._save_last_url, daemon=True).start()
+        
         if self.torrserver_process is None:
             return False
         # Check if process is still running
@@ -422,6 +441,73 @@ class Plugin:
         self.start_torrserver()
         return True
 
+    # Exposes function to stop plugin completely and stop video loading
+    async def stop_all(self) -> bool:
+        decky.logger.info("Stopping Lampa services completely (Stop all)...")
+        self.stop_torrserver()
+        try:
+            # Kill transcoder FFmpeg if running
+            transcoder._kill_process()
+        except Exception as e:
+            decky.logger.error(f"Failed to kill transcoder in stop_all: {e}")
+        return True
+
+    # Exposes function to clear transcode cache and TorrServer DB cache
+    async def clear_cache(self) -> bool:
+        decky.logger.info("Clearing Lampa cache completely...")
+        self.stop_torrserver()
+        try:
+            # Kill transcoder FFmpeg if running
+            transcoder._kill_process()
+            # Clear transcoder directory
+            transcoder._clear_dir()
+        except Exception as e:
+            decky.logger.error(f"Failed to clear transcode cache: {e}")
+
+        # Clear TorrServer DB directory
+        db_path = os.path.join(self.settings_dir, "torrserver")
+        if os.path.exists(db_path):
+            try:
+                shutil.rmtree(db_path, ignore_errors=True)
+                os.makedirs(db_path, exist_ok=True)
+            except Exception as e:
+                decky.logger.error(f"Failed to clear TorrServer DB cache: {e}")
+        
+        # Restart TorrServer
+        self.start_torrserver()
+        return True
+
+    # Exposes function to get user language from Steam
+    async def get_steam_language(self) -> str:
+        paths = []
+        if os.path.isdir("/home"):
+            try:
+                for user in os.listdir("/home"):
+                    if user != "lost+found":
+                        paths.append(f"/home/{user}/.steam/registry.vdf")
+                        paths.append(f"/home/{user}/.steam/steam/registry.vdf")
+            except Exception:
+                pass
+        
+        paths.append(os.path.expanduser("~/.steam/registry.vdf"))
+        paths.append(os.path.expanduser("~/.steam/steam/registry.vdf"))
+        
+        for path in paths:
+            if os.path.isfile(path):
+                try:
+                    with open(path, "r", encoding="utf-8") as f:
+                        content = f.read()
+                    match = re.search(r'"language"\s+"([^"]+)"', content, re.IGNORECASE)
+                    if match:
+                        lang = match.group(1).lower().strip()
+                        decky.logger.info(f"Steam language detected: {lang}")
+                        return lang
+                except Exception as e:
+                    decky.logger.error(f"Error reading Steam language from {path}: {e}")
+                    
+        decky.logger.info("Steam language not found, defaulting to english")
+        return "english"
+
     # Exposes function to open Lampa in Steam native browser
     async def open_lampa(self) -> bool:
         decky.logger.info("Opening Lampa in Steam native browser...")
@@ -431,6 +517,27 @@ class Plugin:
             return True
         except Exception as e:
             decky.logger.error(f"Failed to open Lampa in Steam browser: {e}")
+            return False
+
+    # Exposes function to resume last visited Lampa page
+    async def open_last_lampa(self) -> bool:
+        url = f"http://127.0.0.1:{self.port_lampa}"
+        last_url_path = os.path.join(self.settings_dir, "last_url.txt")
+        if os.path.exists(last_url_path):
+            try:
+                with open(last_url_path, "r") as f:
+                    saved = f.read().strip()
+                    if saved.startswith("http://127.0.0.1:8000"):
+                        url = saved
+            except Exception:
+                pass
+        
+        decky.logger.info(f"Resuming Lampa page: {url}")
+        try:
+            subprocess.Popen(["xdg-open", f"steam://openurl/{url}"], start_new_session=True)
+            return True
+        except Exception as e:
+            decky.logger.error(f"Failed to resume Lampa page: {e}")
             return False
 
     # Spawns VLC or other external player

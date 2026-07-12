@@ -111,23 +111,11 @@
     window.localStorage.setItem('player_nw_path', 'mpv');
   }
 
-  // Force default Lampa configuration and plugins once on first install
+  // Force default Lampa TorrServer configuration once on first install
   if (window.localStorage.getItem('settings_v1_reset') !== 'true') {
     window.localStorage.setItem('torrserver_url', 'http://127.0.0.1:8090');
     window.localStorage.setItem('torrserver_url_two', 'http://127.0.0.1:8090');
     window.localStorage.setItem('torrserver_use_link', 'one');
-
-    window.localStorage.setItem('parser_use', 'true');
-    window.localStorage.setItem('parser_torrent_type', 'jackett');
-    window.localStorage.setItem('parser_jackett_url', 'https://jacred.ru/');
-
-    var defaultPlugins = [
-      { url: 'https://plugin.rootu.top/tmdb.js', status: 1 },
-      { url: 'http://cub.red/plugin/etor', status: 1 },
-      { url: 'https://nb557.github.io/plugins/online_mod.js', status: 1 },
-      { url: 'https://bylampa.github.io/jackett.js', status: 1 }
-    ];
-    window.localStorage.setItem('plugins', JSON.stringify(defaultPlugins));
     window.localStorage.setItem('settings_v1_reset', 'true');
   }
 
