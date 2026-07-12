@@ -727,7 +727,7 @@ class Plugin:
 
     # Serve static Lampa files on port 8000 and handle HTTP /play endpoint
     def start_lampa_http_server(self):
-        lampa_dir = os.path.join(self.plugin_dir, "lampa")
+        lampa_dir = os.path.join(self.plugin_dir, "dist", "lampa")
         if not os.path.exists(lampa_dir):
             decky.logger.warning(f"Lampa directory not found at {lampa_dir}!")
             return
