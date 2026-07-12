@@ -41,6 +41,7 @@ Lampa requires you to add your own online providers, plugins, and torrent parser
 3. Find any movie or TV show, select a torrent stream, and hit **Play**.
 4. To resume a closed session later, simply click **Continue Viewing** in the Decky menu.
 5. If you need to stop buffering or free up space, click **Disable Lampa** or **Clear Cache**.
+6. For a detailed configuration guide, check out this [helpful setup guide](https://gist.github.com/darkmanlv/54132bddd49eef44a3e3afc2606a406b).
 
 ## ⚖️ License & Credits
 

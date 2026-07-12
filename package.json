@@ -4,7 +4,7 @@
   "description": "A template to quickly create decky plugins from scratch, based on TypeScript and webpack",
   "type": "module",
   "scripts": {
-    "build": "rollup -c",
+    "build": "rollup -c && cp -rf lampa dist/lampa",
     "watch": "rollup -c -w",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

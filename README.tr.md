@@ -41,6 +41,7 @@ Lampa, kendi çevrimiçi sağlayıcılarınızı, eklentilerinizi ve torrent ara
 3. Herhangi bir film veya dizi bulun, torrent akışını seçin ve **Oynat** butonuna basın.
 4. Daha sonra izlemeye devam etmek için Decky menüsündeki **İzlemeye Devam Et** butonuna tıklayın.
 5. Disk alanı açmak isterseniz **Devre Dışı Bırak** veya **Önbelleği Temizle** seçeneklerini kullanın.
+6. Lampa ve TorrServer'ın ayrıntılı kurulum ve yapılandırma kılavuzu için [bu yararlı kurulum kılavuzuna göz atın](https://gist.github.com/darkmanlv/54132bddd49eef44a3e3afc2606a406b).
 
 ## ⚖️ Lisans ve Katkıda Bulunanlar
 
