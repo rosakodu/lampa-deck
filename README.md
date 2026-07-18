@@ -2,7 +2,7 @@
 
 [English](README.md) | [Русский](README.ru.md) | [简体中文](README.zh-CN.md) | [繁體中文](README.zh-TW.md) | [العربية](README.ar.md) | [فارسی](README.fa.md) | [Türkçe](README.tr.md)
 
-A Decky Loader plugin for Steam Deck that runs a fully local instance of the **Lampa** catalog and media player alongside **TorrServer-gst** and a custom **HLS fMP4 VP9 Transcoder** for seamless torrent playback directly in the Steam Big Picture CEF browser.
+A Decky Loader plugin for Steam Deck that runs a fully local instance of the **Lampa** catalog and media player alongside **TorrServer-gst** and a custom **WebM VP8 + Opus Transcoder** for seamless torrent playback directly inside the built-in Lampa player in Steam Big Picture (Game Mode).
 
 ![Screenshot](assets/screenshot.png)
 
@@ -10,9 +10,9 @@ A Decky Loader plugin for Steam Deck that runs a fully local instance of the **L
 
 - **Built-in Lampa**: Serve static files of Lampa catalog locally on port 8300.
 - **Embedded TorrServer**: Automatically downloads and starts TorrServer-gst to handle torrent streams locally on port 8090.
-- **On-the-Fly HLS VP9 Transcoding**: Custom background transcode engine using bundled static FFmpeg to transcode incompatible audio/video formats (like H.265/HEVC, AV1, AC-3) to fMP4 VP9 + AAC on the fly for native SteamOS browser playback.
+- **On-the-Fly WebM VP8 + Opus Transcoding**: Custom background transcode engine using bundled static FFmpeg to transcode incompatible audio/video formats (like H.265/HEVC, AV1, H.264, AC-3, DTS, AAC) to WebM VP8 + Opus on the fly. This enables native, hardware-accelerated playback directly inside the Lampa built-in HTML5 player without audio or video errors.
 - **Resume Viewing**: One-click button to resume your last active Lampa session exactly where you left off.
-- **Plugin Management Controls**: Easily restart TorrServer, disable Lampa services, or clear cache (deletes transcode segments and resets TorrServer database to free up disk space).
+- **Plugin Management Controls**: Easily restart TorrServer or clear cache (resets TorrServer database to free up disk space).
 - **Steam Localization**: Automatically detects and adapts UI to English, Russian, Simplified Chinese, Traditional Chinese, Arabic, Persian, or Turkish.
 - **Clean Installation**: No pre-installed trackers, parsers, or third-party plug-ins. Setup everything your way.
 
