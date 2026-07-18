@@ -250,7 +250,7 @@ class Plugin:
         for key in ("LD_LIBRARY_PATH", "LD_PRELOAD", "GST_PLUGIN_PATH", "GST_PLUGIN_SYSTEM_PATH"):
             env.pop(key, None)
 
-        log_dir = "/home/deck/homebrew/logs/lampa-deck"
+        log_dir = os.path.join(self.settings_dir, "logs")
         os.makedirs(log_dir, exist_ok=True)
         log_file_path = os.path.join(log_dir, "torrserver.log")
 
