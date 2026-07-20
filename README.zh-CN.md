@@ -1,6 +1,6 @@
 # lampa-deck
 
-[English](README.md) | [Русский](README.ru.md) | [简体中文](README.zh-CN.md) | [繁體中文](README.zh-TW.md) | [العربية](README.ar.md) | [فارسی](README.fa.md) | [Türkçe](README.tr.md)
+[🇬🇧 English](README.md) | [🇷🇺 Русский](README.ru.md) | [🇺🇦 Українська](README.uk.md) | [🇨🇳 简体中文](README.zh-CN.md) | [🇹🇼 繁體中文](README.zh-TW.md) | [🇸🇦 العربية](README.ar.md) | [🇮🇷 فارسی](README.fa.md) | [🇹🇷 Türkçe](README.tr.md)
 
 一个用于 Steam Deck 的 Decky Loader 插件，可在 Steam Big Picture CEF 浏览器中本地运行 **Lampa** 目录和播放器、**TorrServer-gst** 以及自适应 **HLS fMP4 VP9 转码引擎**，实现流畅的 BT 种子直接播放。
 

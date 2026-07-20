@@ -1,6 +1,6 @@
 # lampa-deck
 
-[English](README.md) | [Русский](README.ru.md) | [简体中文](README.zh-CN.md) | [繁體中文](README.zh-TW.md) | [العربية](README.ar.md) | [فارسی](README.fa.md) | [Türkçe](README.tr.md)
+[🇬🇧 English](README.md) | [🇷🇺 Русский](README.ru.md) | [🇺🇦 Українська](README.uk.md) | [🇨🇳 简体中文](README.zh-CN.md) | [🇹🇼 繁體中文](README.zh-TW.md) | [🇸🇦 العربية](README.ar.md) | [🇮🇷 فارسی](README.fa.md) | [🇹🇷 Türkçe](README.tr.md)
 
 Steam Deck için Lampa kataloğunu ve medya oynatıcısını, TorrServer-gst'yi ve Steam Big Picture CEF tarayıcısında kesintisiz torrent oynatımı için özel bir **HLS fMP4 VP9 Dönüştürücüsünü** tamamen yerel olarak çalıştıran bir Decky Loader eklentisidir.
 

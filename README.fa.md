@@ -1,6 +1,6 @@
 # lampa-deck
 
-[English](README.md) | [Русский](README.ru.md) | [简体中文](README.zh-CN.md) | [繁體中文](README.zh-TW.md) | [العربية](README.ar.md) | [فارسی](README.fa.md) | [Türkçe](README.tr.md)
+[🇬🇧 English](README.md) | [🇷🇺 Русский](README.ru.md) | [🇺🇦 Українська](README.uk.md) | [🇨🇳 简体中文](README.zh-CN.md) | [🇹🇼 繁體中文](README.zh-TW.md) | [🇸🇦 العربية](README.ar.md) | [🇮🇷 فارسی](README.fa.md) | [🇹🇷 Türkçe](README.tr.md)
 
 یک پلاگین Decky Loader برای Steam Deck که یک نسخه کاملاً محلی از کاتالوگ و پخش‌کننده **Lampa** را به همراه **TorrServer-gst** و یک مبدل کد مجهز به **HLS fMP4 VP9** سفارشی برای پخش روان تورنت‌ها مستقیماً در مرورگر Steam Big Picture CEF اجرا می‌کند.
 

@@ -91,13 +91,26 @@ class Plugin:
 
     async def get_torrserver_status(self) -> bool:
         threading.Thread(target=self._save_last_url, daemon=True).start()
-        if self.torrserver_process is None:
-            return False
-        poll = self.torrserver_process.poll()
-        if poll is not None:
-            self.torrserver_process = None
-            return False
-        return True
+        
+        # 1. Check if our own process is active
+        if self.torrserver_process is not None and self.torrserver_process.poll() is None:
+            return True
+            
+        # 2. Fallback: check if any TorrServer is already running on port 8090
+        try:
+            context = ssl._create_unverified_context()
+            url = f"http://127.0.0.1:{self.port_torrserver}/"
+            # Just request the home page or settings, timeout quickly
+            req = urllib.request.Request(url, method="GET")
+            with urllib.request.urlopen(req, timeout=0.8, context=context) as resp:
+                if resp.status == 200:
+                    return True
+        except Exception:
+            pass
+
+        # Clear process ref if it died
+        self.torrserver_process = None
+        return False
 
     async def restart_torrserver(self) -> bool:
         decky.logger.info("Restarting TorrServer...")
@@ -240,7 +253,7 @@ class Plugin:
         os.makedirs(db_path, exist_ok=True)
 
         try:
-            subprocess.run(["killall", "-9", "TorrServer", "TorrServer-gst"],
+            subprocess.run(["killall", "-9", "TorrServer", "TorrServer-gst", "torrserver"],
                            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
             time.sleep(0.5)
         except Exception:

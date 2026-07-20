@@ -1,6 +1,6 @@
 # lampa-deck
 
-[English](README.md) | [Русский](README.ru.md) | [Українська](README.uk.md) | [简体中文](README.zh-CN.md) | [繁體中文](README.zh-TW.md) | [العربية](README.ar.md) | [فарсія](README.fa.md) | [Türkçe](README.tr.md)
+[🇬🇧 English](README.md) | [🇷🇺 Русский](README.ru.md) | [🇺🇦 Українська](README.uk.md) | [🇨🇳 简体中文](README.zh-CN.md) | [🇹🇼 繁體中文](README.zh-TW.md) | [🇸🇦 العربية](README.ar.md) | [🇮🇷 فارسی](README.fa.md) | [🇹🇷 Türkçe](README.tr.md)
 
 Плагін для Decky Loader на Steam Deck, який запускає повністю локальний екземпляр каталогу та плеєра **Lampa**, TorrServer-gst та кастомний транскодер **WebM VP8 + Opus** для безшовного відтворення торрентів у вбудованому плеєрі Lampa в Steam Big Picture (Ігровому режимі).
 

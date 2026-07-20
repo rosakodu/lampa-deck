@@ -1,6 +1,6 @@
 # lampa-deck
 
-[English](README.md) | [Русский](README.ru.md) | [简体中文](README.zh-CN.md) | [繁體中文](README.zh-TW.md) | [العربية](README.ar.md) | [فارسی](README.fa.md) | [Türkçe](README.tr.md)
+[🇬🇧 English](README.md) | [🇷🇺 Русский](README.ru.md) | [🇺🇦 Українська](README.uk.md) | [🇨🇳 简体中文](README.zh-CN.md) | [🇹🇼 繁體中文](README.zh-TW.md) | [🇸🇦 العربية](README.ar.md) | [🇮🇷 فارسی](README.fa.md) | [🇹🇷 Türkçe](README.tr.md)
 
 ملحق لـ Decky Loader لجهاز Steam Deck يقوم بتشغيل نسخة محلية بالكامل من كتالوج ومشغل **Lampa** إلى جانب **TorrServer-gst** ومحول برمجيات **HLS fMP4 VP9** مخصص لتشغيل ملفات التورنت بسلاسة داخل متصفح Steam Big Picture CEF.
 
