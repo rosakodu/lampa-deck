@@ -35,6 +35,7 @@ const T: Record<string, Record<string, string>> = {
     restarted:        "TorrServer restarted!",
     cacheCleared:     "Cache cleared!",
     restarting:       "Restarting…",
+    support:          "Support",
   },
   russian: {
     title:            "Lampa Deck",
@@ -52,6 +53,7 @@ const T: Record<string, Record<string, string>> = {
     restarted:        "TorrServer перезапущен!",
     cacheCleared:     "Кэш очищен!",
     restarting:       "Перезапуск…",
+    support:          "Поддержка",
   },
 };
 
@@ -109,6 +111,13 @@ function Content() {
     } catch (e) { toaster.toast({ title: t.error, body: String(e) }); }
   };
 
+  const openSupport = () => {
+    try {
+      Router.CloseSideMenus();
+      Navigation.NavigateToExternalWeb("https://vk.ru/valvesteamdeck");
+    } catch (e) { toaster.toast({ title: t.error, body: String(e) }); }
+  };
+
   const handleRestart = async () => {
     setLoading(true);
     try {
@@ -159,6 +168,13 @@ function Content() {
       <PanelSectionRow>
         <ButtonItem layout="below" disabled={loading} onClick={handleClearCache}>
           {t.clearCache}
+        </ButtonItem>
+      </PanelSectionRow>
+
+      {/* Support */}
+      <PanelSectionRow>
+        <ButtonItem layout="below" onClick={openSupport}>
+          {t.support}
         </ButtonItem>
       </PanelSectionRow>
 
