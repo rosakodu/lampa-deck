@@ -1,5 +1,17 @@
 import os
 import sys
+
+# Ensure system Python paths and http package path are available in PyInstaller sandbox
+py_ver = f"{sys.version_info.major}.{sys.version_info.minor}"
+sys_lib = f"/usr/lib/python{py_ver}"
+for p in [sys_lib, f"{sys_lib}/lib-dynload", f"{sys_lib}/site-packages"]:
+    if os.path.isdir(p) and p not in sys.path:
+        sys.path.append(p)
+
+import http
+if hasattr(http, "__path__") and f"{sys_lib}/http" not in http.__path__:
+    http.__path__.append(f"{sys_lib}/http")
+
 import subprocess
 import urllib.request
 import urllib.parse
