@@ -1,50 +1,50 @@
 # lampa-deck
 
-[🇬🇧 English](README.md) | [🇷🇺 Русский](README.ru.md) | [🇺🇦 Українська](README.uk.md) | [🇨🇳 简体中文](README.zh-CN.md) | [🇹🇼 繁體中文](README.zh-TW.md) | [🇸🇦 العربية](README.ar.md) | [🇮🇷 فارسی](README.fa.md) | [🇹🇷 Türkçe](README.tr.md)
+[🇷🇺 Русский](README.md) | [🇬🇧 English](README.en.md) | [🇺🇦 Українська](README.uk.md) | [🇨🇳 简体中文](README.zh-CN.md) | [🇹🇼 繁體中文](README.zh-TW.md) | [🇸🇦 العربية](README.ar.md) | [🇮🇷 فارسی](README.fa.md) | [🇹🇷 Türkçe](README.tr.md)
 
-A Decky Loader plugin for Steam Deck that runs a fully local instance of the **Lampa** catalog and media player alongside **TorrServer-gst** and a custom **WebM VP8 + Opus Transcoder** for seamless torrent playback directly inside the built-in Lampa player in Steam Big Picture (Game Mode).
+Плагин для Decky Loader на Steam Deck, который запускает полностью локальный экземпляр каталога и плеера **Lampa**, TorrServer-gst и кастомный транскодер **WebM VP8 + Opus** для бесшовного воспроизведения торрентов во встроенном плеере Lampa в Steam Big Picture (Игровом режиме).
 
 ![Screenshot](assets/screenshot.png)
 
-## 📋 Features
+## 📋 Возможности
 
-- **Built-in Lampa**: Serve static files of Lampa catalog locally on port 8300.
-- **Embedded TorrServer**: Automatically downloads and starts TorrServer-gst to handle torrent streams locally on port 8090.
-- **On-the-Fly WebM VP8 + Opus Transcoding**: Custom background transcode engine using bundled static FFmpeg to transcode incompatible audio/video formats (like H.265/HEVC, AV1, H.264, AC-3, DTS, AAC) to WebM VP8 + Opus on the fly. This enables native, hardware-accelerated playback directly inside the Lampa built-in HTML5 player without audio or video errors.
-- **Resume Viewing**: One-click button to resume your last active Lampa session exactly where you left off.
-- **Plugin Management Controls**: Easily restart TorrServer or clear cache (resets TorrServer database to free up disk space).
-- **Steam Localization**: Automatically detects and adapts UI to English, Russian, Simplified Chinese, Traditional Chinese, Arabic, Persian, or Turkish.
-- **Clean Installation**: No pre-installed trackers, parsers, or third-party plug-ins. Setup everything your way.
+- **Локальный Lampa**: Раздает статические файлы Lampa на порту 8300.
+- **Встроенный TorrServer**: Автоматически скачивает стабильный TorrServer-gst для локального стриминга торрентов на порту 8090.
+- **Транскодирование WebM VP8 + Opus**: Фоновый движок транскодирования на базе FFmpeg преобразует неподдерживаемые в SteamOS форматы видео (HEVC/H.265, AV1, H.264) и аудио (AC-3, DTS, AAC) в полностью свободный формат WebM (VP8 + Opus) на лету. Это позволяет воспроизводить любые фильмы прямо во встроенном плеере Lampa без ошибок звука и изображения.
+- **Продолжить просмотр**: Кнопка для запуска Lampa на последней открытой странице/вкладке.
+- **Панель управления**: Быстрый перезапуск TorrServer и кнопка очистки кэша (очищает базу данных TorrServer для освобождения места).
+- **Локализация**: Полный перевод интерфейса на английский, русский, китайский (упрощенный и традиционный), арабский, персидский и турецкий языки.
+- **Чистая установка**: Плагин поставляется без предустановленных плагинов, парсеров и сторонних ресурсов. Настраивайте всё под себя.
 
-## 📦 Setup & Recommendations
+## 📦 Рекомендации по настройке
 
-Lampa requires you to add your own online providers, plugins, and torrent parsers. Here are the recommended links to get started:
+Lampa требует ручного добавления источников контента. Мы рекомендуем использовать следующие ресурсы:
 
-- **TorrServer URL**: Automatically pre-configured in your Lampa settings as `http://127.0.0.1:8090`.
-- **Search Parsers**: We recommend configuring Jackett/TorrServer search parsers using [JacRed](https://jacred.ru/) (`https://jacred.ru/`).
-- **Popular Plugins**:
-  - **TMDB / Online Media**: Find plugins in [nb557 Lampa Plugins](https://github.com/nb557/lampa-plugins) or use `https://plugin.rootu.top/tmdb.js`.
-  - **CUB Service**: Visit [CUB.red](http://cub.red/) for synced bookmarks and lists.
-  - **Jackett Search Plugin**: Find it via [Bylampa Community](https://github.com/bylampa/bylampa.github.io).
+- **Адрес TorrServer**: Уже настроен в Lampa по умолчанию как `http://127.0.0.1:8090`.
+- **Поиск по торрентам**: Рекомендуем использовать популярный парсер [JacRed](https://jacred.ru/) (`https://jacred.ru/`).
+- **Полезные плагины**:
+  - **TMDB / Онлайн просмотр**: Репозиторий плагинов [nb557 Lampa Plugins](https://github.com/nb557/lampa-plugins) или плагин `https://plugin.rootu.top/tmdb.js`.
+  - **Синхронизация CUB**: Сервис [CUB.red](http://cub.red/) для хранения закладок.
+  - **Плагин поиска Jackett**: Доступен через сообщество [Bylampa](https://github.com/bylampa/bylampa.github.io).
 
-## 📥 Installation
+## 📥 Установка
 
-1. Download the latest release (`lampa-deck.zip`) from the Releases page.
-2. Transfer the ZIP file to your Steam Deck.
-3. Turn on **Developer Mode** in Steam Deck settings.
-4. Enable **Developer settings** in Decky Loader, activate **Developer mode**, and select **Install plugin from file** to upload the ZIP.
+1. Скачайте ZIP-архив (`lampa-deck.zip`) со страницы релизов.
+2. Скопируйте ZIP-архив на ваш Steam Deck.
+3. Включите **Режим разработчика** в системных настройках Steam Deck.
+4. В настройках Decky Loader перейдите в раздел разработчика, активируйте **Developer mode** и выберите **Install plugin from file**.
 
-## 🚀 Usage
+## 🚀 Использование
 
-1. Open the Decky Loader menu and click **Open Lampa** to launch Lampa.
-2. In Lampa Settings, configure your TMDB tokens, plugins, and JacRed parser URL.
-3. Find any movie or TV show, select a torrent stream, and hit **Play**.
-4. To resume a closed session later, simply click **Continue Viewing** in the Decky menu.
-5. If you need to stop buffering or free up space, click **Disable Lampa** or **Clear Cache**.
-6. For a detailed configuration guide, check out this [helpful setup guide](https://gist.github.com/darkmanlv/54132bddd49eef44a3e3afc2606a406b).
+1. В меню Decky нажмите **Открыть Lampa**.
+2. В настройках Lampa пропишите адрес парсера JacRed и добавьте необходимые плагины.
+3. Откройте любой фильм, выберите торрент-файл и нажмите **Play**.
+4. Для возврата к сессии позже используйте кнопку **Продолжить просмотр**.
+5. Если нужно прервать буферизацию, нажмите **Отключить** или **Удалить кэш**.
+6. Подробное руководство по ручной настройке Lampa и TorrServer доступно в [этом полезном руководстве](https://gist.github.com/darkmanlv/54132bddd49eef44a3e3afc2606a406b).
 
-## ⚖️ License & Credits
+## ⚖️ Лицензия и Авторы
 
-- [Lampa App Source](https://github.com/lampa-app/lampa) (Lampa Creators)
+- [Официальный репозиторий Lampa](https://github.com/lampa-app/lampa) (Создатели Lampa)
 - [TorrServer-gst](https://github.com/YouROK/TorrServer) (YouROK)
-- BSD-3-Clause License.
+- Лицензия BSD-3-Clause.

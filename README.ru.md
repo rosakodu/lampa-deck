@@ -1,6 +1,6 @@
 # lampa-deck
 
-[🇬🇧 English](README.md) | [🇷🇺 Русский](README.ru.md) | [🇺🇦 Українська](README.uk.md) | [🇨🇳 简体中文](README.zh-CN.md) | [🇹🇼 繁體中文](README.zh-TW.md) | [🇸🇦 العربية](README.ar.md) | [🇮🇷 فارسی](README.fa.md) | [🇹🇷 Türkçe](README.tr.md)
+[🇷🇺 Русский](README.md) | [🇬🇧 English](README.en.md) | [🇺🇦 Українська](README.uk.md) | [🇨🇳 简体中文](README.zh-CN.md) | [🇹🇼 繁體中文](README.zh-TW.md) | [🇸🇦 العربية](README.ar.md) | [🇮🇷 فارسی](README.fa.md) | [🇹🇷 Türkçe](README.tr.md)
 
 Плагин для Decky Loader на Steam Deck, который запускает полностью локальный экземпляр каталога и плеера **Lampa**, TorrServer-gst и кастомный транскодер **WebM VP8 + Opus** для бесшовного воспроизведения торрентов во встроенном плеере Lampa в Steam Big Picture (Игровом режиме).
 
@@ -29,7 +29,7 @@ Lampa требует ручного добавления источников к
 
 ## 📥 Установка
 
-1. СкачайтеZIP-архив (`lampa-deck.zip`) со страницы релизов.
+1. Скачайте ZIP-архив (`lampa-deck.zip`) со страницы релизов.
 2. Скопируйте ZIP-архив на ваш Steam Deck.
 3. Включите **Режим разработчика** в системных настройках Steam Deck.
 4. В настройках Decky Loader перейдите в раздел разработчика, активируйте **Developer mode** и выберите **Install plugin from file**.
