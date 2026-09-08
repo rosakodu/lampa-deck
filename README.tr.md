@@ -21,7 +21,7 @@ Steam Deck için Lampa kataloğunu ve medya oynatıcısını, TorrServer-gst'yi 
 Lampa, kendi çevrimiçi sağlayıcılarınızı, eklentilerinizi ve torrent arama motorlarınızı eklemenizi gerektirir. Başlamak için önerilen bağlantılar şunlardır:
 
 - **TorrServer Adresi**: Lampa ayarlarınızda otomatik olarak `http://127.0.0.1:8090` şeklinde yapılandırılmıştır.
-- **Arama Motorları (Parser)**: TorrServer arama motoru olarak popüler [JacRed](https://jacred.ru/) (`https://jacred.ru/`) servisini yapılandırmanızı öneririz.
+- **Arama Motorları (Parser)**: TorrServer arama motoru olarak popüler [JacRed](https://jac.red/) (`https://jac.red/`) servisini yapılandırmanızı öneririz.
 - **Popüler Eklentiler**:
   - **TMDB / Çevrimiçi Medya**: Eklentileri [nb557 Lampa Plugins](https://github.com/nb557/lampa-plugins) sayfasında bulabilir veya doğrudan `https://plugin.rootu.top/tmdb.js` adresini kullanabilirsiniz.
   - **CUB Servisi**: Yer imlerini ve geçmişi eşitlemek için [CUB.red](http://cub.red/) adresini ziyaret edin.

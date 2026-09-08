@@ -21,7 +21,7 @@
 Lampa 启动后需要手动配置资源源、插件和种子解析器。以下是推荐的链接和配置说明：
 
 - **TorrServer 地址**：已自动配置为 `http://127.0.0.1:8090`。
-- **种子搜索解析器**：推荐配置 Jackett/TorrServer 种子解析器服务如 [JacRed](https://jacred.ru/) (`https://jacred.ru/`)。
+- **种子搜索解析器**：推荐配置 Jackett/TorrServer 种子解析器服务如 [JacRed](https://jac.red/) (`https://jac.red/`)。
 - **常用插件**：
   - **TMDB / 在线媒体**：可在 [nb557 Lampa Plugins](https://github.com/nb557/lampa-plugins) 找到插件或直接使用 `https://plugin.rootu.top/tmdb.js`。
   - **CUB 服务**：访问 [CUB.red](http://cub.red/) 以同步收藏夹与历史记录。

@@ -21,7 +21,7 @@
 Lampa 啟動後需要手動配置資源源、插件和種子解析器。以下是推薦的鏈接和配置說明：
 
 - **TorrServer 地址**：已自動配置為 `http://127.0.0.1:8090`。
-- **種子搜尋解析器**：推薦配置 Jackett/TorrServer 種子解析器服務如 [JacRed](https://jacred.ru/) (`https://jacred.ru/`)。
+- **種子搜尋解析器**：推薦配置 Jackett/TorrServer 種子解析器服務如 [JacRed](https://jac.red/) (`https://jac.red/`)。
 - **常用插件**：
   - **TMDB / 在線媒體**：可在 [nb557 Lampa Plugins](https://github.com/nb557/lampa-plugins) 找到插件或直接使用 `https://plugin.rootu.top/tmdb.js`。
   - **CUB 服務**：訪問 [CUB.red](http://cub.red/) 以同步收藏夾與歷史記錄。

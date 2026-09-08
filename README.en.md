@@ -21,7 +21,7 @@ A Decky Loader plugin for Steam Deck that runs a fully local instance of the **L
 Lampa requires you to add your own online providers, plugins, and torrent parsers. Here are the recommended links to get started:
 
 - **TorrServer URL**: Automatically pre-configured in your Lampa settings as `http://127.0.0.1:8090`.
-- **Search Parsers**: We recommend configuring Jackett/TorrServer search parsers using [JacRed](https://jacred.ru/) (`https://jacred.ru/`).
+- **Search Parsers**: We recommend configuring Jackett/TorrServer search parsers using [JacRed](https://jac.red/) (`https://jac.red/`).
 - **Popular Plugins**:
   - **TMDB / Online Media**: Find plugins in [nb557 Lampa Plugins](https://github.com/nb557/lampa-plugins) or use `https://plugin.rootu.top/tmdb.js`.
   - **CUB Service**: Visit [CUB.red](http://cub.red/) for synced bookmarks and lists.

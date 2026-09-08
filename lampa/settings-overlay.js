@@ -61,8 +61,8 @@
 
   window.localStorage.setItem('parser_use', 'true');
   window.localStorage.setItem('parser_torrent_type', 'jackett');
-  window.localStorage.setItem('parser_jackett_url', 'https://jacred.ru/');
-  window.localStorage.setItem('jackett_url', 'https://jacred.ru');
+  window.localStorage.setItem('parser_jackett_url', 'https://jac.red/');
+  window.localStorage.setItem('jackett_url', 'https://jac.red');
 
   window.localStorage.setItem('player', 'inner');
   window.localStorage.setItem('player_torrent', 'inner');
@@ -95,8 +95,8 @@
 
         window.Lampa.Storage.set('parser_use', 'true');
         window.Lampa.Storage.set('parser_torrent_type', 'jackett');
-        window.Lampa.Storage.set('parser_jackett_url', 'https://jacred.ru/');
-        window.Lampa.Storage.set('jackett_url', 'https://jacred.ru');
+        window.Lampa.Storage.set('parser_jackett_url', 'https://jac.red/');
+        window.Lampa.Storage.set('jackett_url', 'https://jac.red');
 
         window.Lampa.Storage.set('player', 'inner');
         window.Lampa.Storage.set('player_torrent', 'inner');
