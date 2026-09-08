@@ -8,6 +8,17 @@
     window.localStorage.setItem("tmdb_lang", "ru");
     window.localStorage.setItem("keyboard_default_lang", "ru");
 
+    // Локальный TorrServer Matrix (порт 8090)
+    window.localStorage.setItem("torrserver_url", "http://127.0.0.1:8090");
+    window.localStorage.setItem("torrserver_url_two", "http://127.0.0.1:8090");
+    window.localStorage.setItem("torrserver_use_link", "one");
+    window.localStorage.setItem("torrserver_gts", "false");
+
+    // Встроенный плеер
+    window.localStorage.setItem("player", "inner");
+    window.localStorage.setItem("player_torrent", "inner");
+    window.localStorage.setItem("player_iptv", "inner");
+
     // Путь к внешнему плееру в Linux (защита от Windows путей C:\... в кодовой базе Lampa)
     try {
       var curNwPath = window.localStorage.getItem('player_nw_path') || '';

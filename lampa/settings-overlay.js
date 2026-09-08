@@ -48,11 +48,20 @@
     } catch (e) {}
   }, 3000);
 
-  // ── 5. Enforce Russian locale ─────
+  // ── 5. Enforce Russian locale and TorrServer Matrix defaults ─────
   window.localStorage.setItem('platform', 'electron');
   window.localStorage.setItem('language', 'ru');
   window.localStorage.setItem('tmdb_lang', 'ru');
   window.localStorage.setItem('keyboard_default_lang', 'ru');
+
+  window.localStorage.setItem('torrserver_url', 'http://127.0.0.1:8090');
+  window.localStorage.setItem('torrserver_url_two', 'http://127.0.0.1:8090');
+  window.localStorage.setItem('torrserver_use_link', 'one');
+  window.localStorage.setItem('torrserver_gts', 'false');
+
+  window.localStorage.setItem('player', 'inner');
+  window.localStorage.setItem('player_torrent', 'inner');
+  window.localStorage.setItem('player_iptv', 'inner');
 
   // ── 6. Poll and update Lampa.Storage RAM cache as soon as Lampa is ready ──
   function fixStorage() {
@@ -61,6 +70,15 @@
         window.Lampa.Storage.set('language', 'ru');
         window.Lampa.Storage.set('tmdb_lang', 'ru');
         window.Lampa.Storage.set('keyboard_default_lang', 'ru');
+
+        window.Lampa.Storage.set('torrserver_url', 'http://127.0.0.1:8090');
+        window.Lampa.Storage.set('torrserver_url_two', 'http://127.0.0.1:8090');
+        window.Lampa.Storage.set('torrserver_use_link', 'one');
+        window.Lampa.Storage.set('torrserver_gts', 'false');
+
+        window.Lampa.Storage.set('player', 'inner');
+        window.Lampa.Storage.set('player_torrent', 'inner');
+        window.Lampa.Storage.set('player_iptv', 'inner');
 
         var nwPath = window.Lampa.Storage.get('player_nw_path');
         if (!nwPath || nwPath.indexOf('C:') !== -1 || nwPath.indexOf('vlc.exe') !== -1) {
