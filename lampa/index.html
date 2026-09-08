@@ -17,24 +17,37 @@
     // 3. Парсер JacRed / Jackett
     window.localStorage.setItem("parser_use", "true");
     window.localStorage.setItem("parser_torrent_type", "jackett");
-    window.localStorage.setItem("parser_jackett_url", "https://jac.red/");
+    window.localStorage.setItem("parser_use_link", "one");
+    window.localStorage.setItem("parser_jackett_url", "https://jac.red");
     window.localStorage.setItem("jackett_url", "https://jac.red");
+    window.localStorage.setItem("jackett_url_two", "https://jac.red");
+    window.localStorage.setItem("jackett_key", "");
+    window.localStorage.setItem("jackett_key_two", "");
+    window.localStorage.setItem("jackett_interview", "all");
 
     // 4. Встроенный плеер
     window.localStorage.setItem("player", "inner");
     window.localStorage.setItem("player_torrent", "inner");
     window.localStorage.setItem("player_iptv", "inner");
 
-    // 5. Обязательные плагины (TMDB proxy, etor, online_mod, jackett)
+    // 5. Обязательные плагины (TMDB proxy, etor, online_mod)
     try {
       var _curPlugs = window.localStorage.getItem("plugins");
+      var _defaultPlugs = [
+        { url: "https://plugin.rootu.top/tmdb.js", status: 1 },
+        { url: "http://cub.red/plugin/etor", status: 1 },
+        { url: "https://nb557.github.io/plugins/online_mod.js", status: 1 }
+      ];
       if (!_curPlugs || _curPlugs === "[]" || _curPlugs === "null") {
-        window.localStorage.setItem("plugins", JSON.stringify([
-          { url: "https://plugin.rootu.top/tmdb.js", status: 1 },
-          { url: "http://cub.red/plugin/etor", status: 1 },
-          { url: "https://nb557.github.io/plugins/online_mod.js", status: 1 },
-          { url: "https://bylampa.github.io/jackett.js", status: 1 }
-        ]));
+        window.localStorage.setItem("plugins", JSON.stringify(_defaultPlugs));
+      } else {
+        var _parsedPlugs = JSON.parse(_curPlugs);
+        var _filteredPlugs = _parsedPlugs.filter(function(p) {
+          return p.url.indexOf("bylampa.github.io/jackett.js") === -1;
+        });
+        if (_filteredPlugs.length !== _parsedPlugs.length) {
+          window.localStorage.setItem("plugins", JSON.stringify(_filteredPlugs));
+        }
       }
     } catch(e) {}
 
