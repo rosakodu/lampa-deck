@@ -48,50 +48,11 @@
     } catch (e) {}
   }, 3000);
 
-  // ── 5. Enforce Russian locale and TorrServer defaults in localStorage ─────
+  // ── 5. Enforce Russian locale ─────
   window.localStorage.setItem('platform', 'electron');
   window.localStorage.setItem('language', 'ru');
   window.localStorage.setItem('tmdb_lang', 'ru');
   window.localStorage.setItem('keyboard_default_lang', 'ru');
-
-  window.localStorage.setItem('torrserver_url', 'http://127.0.0.1:8090');
-  window.localStorage.setItem('torrserver_url_two', 'http://127.0.0.1:8090');
-  window.localStorage.setItem('torrserver_use_link', 'one');
-  window.localStorage.setItem('torrserver_gts', 'false');
-
-  window.localStorage.setItem('parser_use', 'true');
-  window.localStorage.setItem('parser_torrent_type', 'jackett');
-  window.localStorage.setItem('parser_use_link', 'one');
-  window.localStorage.setItem('parser_jackett_url', 'https://jac.red');
-  window.localStorage.setItem('jackett_url', 'https://jac.red');
-  window.localStorage.setItem('jackett_url_two', 'https://jac.red');
-  window.localStorage.setItem('jackett_key', '');
-  window.localStorage.setItem('jackett_key_two', '');
-  window.localStorage.setItem('jackett_interview', 'all');
-
-  window.localStorage.setItem('player', 'inner');
-  window.localStorage.setItem('player_torrent', 'inner');
-  window.localStorage.setItem('player_iptv', 'inner');
-
-  try {
-    var curPlugs = window.localStorage.getItem('plugins');
-    var defaultPlugs = [
-      { url: 'https://plugin.rootu.top/tmdb.js', status: 1 },
-      { url: 'http://cub.red/plugin/etor', status: 1 },
-      { url: 'https://nb557.github.io/plugins/online_mod.js', status: 1 }
-    ];
-    if (!curPlugs || curPlugs === '[]' || curPlugs === 'null') {
-      window.localStorage.setItem('plugins', JSON.stringify(defaultPlugs));
-    } else {
-      var parsedPlugs = JSON.parse(curPlugs);
-      var filteredPlugs = parsedPlugs.filter(function(p) {
-        return p.url.indexOf('bylampa.github.io/jackett.js') === -1;
-      });
-      if (filteredPlugs.length !== parsedPlugs.length) {
-        window.localStorage.setItem('plugins', JSON.stringify(filteredPlugs));
-      }
-    }
-  } catch (e) {}
 
   // ── 6. Poll and update Lampa.Storage RAM cache as soon as Lampa is ready ──
   function fixStorage() {
@@ -100,41 +61,6 @@
         window.Lampa.Storage.set('language', 'ru');
         window.Lampa.Storage.set('tmdb_lang', 'ru');
         window.Lampa.Storage.set('keyboard_default_lang', 'ru');
-
-        window.Lampa.Storage.set('torrserver_url', 'http://127.0.0.1:8090');
-        window.Lampa.Storage.set('torrserver_url_two', 'http://127.0.0.1:8090');
-        window.Lampa.Storage.set('torrserver_use_link', 'one');
-        window.Lampa.Storage.set('torrserver_gts', 'false');
-
-        window.Lampa.Storage.set('parser_use', 'true');
-        window.Lampa.Storage.set('parser_torrent_type', 'jackett');
-        window.Lampa.Storage.set('parser_use_link', 'one');
-        window.Lampa.Storage.set('parser_jackett_url', 'https://jac.red');
-        window.Lampa.Storage.set('jackett_url', 'https://jac.red');
-        window.Lampa.Storage.set('jackett_url_two', 'https://jac.red');
-        window.Lampa.Storage.set('jackett_key', '');
-        window.Lampa.Storage.set('jackett_key_two', '');
-        window.Lampa.Storage.set('jackett_interview', 'all');
-
-        window.Lampa.Storage.set('player', 'inner');
-        window.Lampa.Storage.set('player_torrent', 'inner');
-        window.Lampa.Storage.set('player_iptv', 'inner');
-
-        var curPlugs = window.Lampa.Storage.get('plugins');
-        if (!curPlugs || !curPlugs.length) {
-          window.Lampa.Storage.set('plugins', [
-            { url: 'https://plugin.rootu.top/tmdb.js', status: 1 },
-            { url: 'http://cub.red/plugin/etor', status: 1 },
-            { url: 'https://nb557.github.io/plugins/online_mod.js', status: 1 }
-          ]);
-        } else {
-          var filtered = curPlugs.filter(function(p) {
-            return p.url.indexOf('bylampa.github.io/jackett.js') === -1;
-          });
-          if (filtered.length !== curPlugs.length) {
-            window.Lampa.Storage.set('plugins', filtered);
-          }
-        }
 
         var nwPath = window.Lampa.Storage.get('player_nw_path');
         if (!nwPath || nwPath.indexOf('C:') !== -1 || nwPath.indexOf('vlc.exe') !== -1) {

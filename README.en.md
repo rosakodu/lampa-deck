@@ -14,34 +14,60 @@ A Decky Loader plugin for Steam Deck that runs a fully local instance of the **L
 - **Resume Viewing**: One-click button to resume your last active Lampa session exactly where you left off.
 - **Plugin Management Controls**: Easily restart TorrServer or clear cache (resets TorrServer database to free up disk space).
 - **Steam Localization**: Automatically detects and adapts UI to English, Russian, Simplified Chinese, Traditional Chinese, Arabic, Persian, or Turkish.
-- **Clean Installation**: No pre-installed trackers, parsers, or third-party plug-ins. Setup everything your way.
+- **Clean Installation (Compliance)**: The plugin ships as clean software with no pre-configured trackers, parsers, or third-party scraper scripts. All sources are configured by the user manually.
 
-## 📦 Setup & Recommendations
+---
 
-Lampa requires you to add your own online providers, plugins, and torrent parsers. Here are the recommended links to get started:
+## ⚙️ Initial Lampa Setup (Required Settings)
 
-- **TorrServer URL**: Automatically pre-configured in your Lampa settings as `http://127.0.0.1:8090`.
-- **Search Parsers**: We recommend configuring Jackett/TorrServer search parsers using [JacRed](https://jac.red/) (`https://jac.red/`).
-- **Popular Plugins**:
-  - **TMDB / Online Media**: Find plugins in [nb557 Lampa Plugins](https://github.com/nb557/lampa-plugins) or use `https://plugin.rootu.top/tmdb.js`.
-  - **CUB Service**: Visit [CUB.red](http://cub.red/) for synced bookmarks and lists.
-  - **Jackett Search Plugin**: Find it via [Bylampa Community](https://github.com/bylampa/bylampa.github.io).
+Lampa is a modular platform and requires you to configure content sources. Follow these simple steps in Lampa:
+
+### 1. Connect to Local TorrServer
+TorrServer runs automatically in the background on your Steam Deck. To route torrent streams to it:
+1. In Lampa, navigate to **Settings** (gear icon in the sidebar) ➔ **TorrServer**.
+2. Set **Main Link** (Link #1) to:
+   ```text
+   http://127.0.0.1:8090
+   ```
+3. Make sure **Use link** is set to **One**.
+
+### 2. Configure Torrent Parser (Searching Streams)
+To search for releases across torrent trackers:
+1. In Lampa **Settings**, navigate to **Parser**.
+2. Enable **Use parser**: set to **Yes**.
+3. Select **Parser type**: **Jackett**.
+4. Set **Jackett link** to a public or private parser, e.g.:
+   ```text
+   https://jac.red
+   ```
+   *(Or your own local Jackett / Prowlarr / JacRed instance)*.
+
+### 3. Adding Plug-ins (TMDB, Online Streaming, CUB)
+Plug-ins provide metadata, cover art, and online streaming options:
+1. In Lampa **Settings**, open the **Plugins** section.
+2. Click **Add Plugin** and enter the plugin URL:
+   * **TMDB Proxy** (fixes posters, ratings, and descriptions):
+     ```text
+     https://plugin.rootu.top/tmdb.js
+     ```
+   * **CUB / etor** (torrent sources and extended details):
+     ```text
+     http://cub.red/plugin/etor
+     ```
+   * **Online Streaming** (stream directly from online balancers without torrents):
+     ```text
+     https://nb557.github.io/plugins/online_mod.js
+     ```
+3. Restart Lampa after adding plugins to apply changes.
+
+---
 
 ## 📥 Installation
 
-1. Download the latest release (`lampa-deck.zip`) from the Releases page.
-2. Transfer the ZIP file to your Steam Deck.
-3. Turn on **Developer Mode** in Steam Deck settings.
-4. Enable **Developer settings** in Decky Loader, activate **Developer mode**, and select **Install plugin from file** to upload the ZIP.
+1. Download `lampa-deck.zip` from the [Releases page](https://gitflic.ru/project/rosakodu/lampa-deck/release).
+2. Or install directly via the [deckyloader.ru](https://deckyloader.ru/) catalog.
 
-## 🚀 Usage
-
-1. Open the Decky Loader menu and click **Open Lampa** to launch Lampa.
-2. In Lampa Settings, configure your TMDB tokens, plugins, and JacRed parser URL.
-3. Find any movie or TV show, select a torrent stream, and hit **Play**.
-4. To resume a closed session later, simply click **Continue Viewing** in the Decky menu.
-5. If you need to stop buffering or free up space, click **Disable Lampa** or **Clear Cache**.
-6. For a detailed configuration guide, check out this [helpful setup guide](https://gist.github.com/darkmanlv/54132bddd49eef44a3e3afc2606a406b).
+---
 
 ## ⚖️ License & Credits
 
