@@ -230,34 +230,42 @@ class Plugin:
         return os.path.join(plugin_dir, "bin", name)
 
     def download_torrserver_binary(self, bin_path):
-        url = "https://github.com/YouROK/TorrServer/releases/latest/download/TorrServer-linux-amd64"
-        decky.logger.info(f"Downloading TorrServer binary from {url}...")
+        urls = [
+            "https://deckyloader.ru/store/bin/TorrServer-linux-amd64",
+            "https://github.com/YouROK/TorrServer/releases/latest/download/TorrServer-linux-amd64"
+        ]
         os.makedirs(os.path.dirname(bin_path), exist_ok=True)
-        req = urllib.request.Request(
-            url,
-            headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"}
-        )
-        try:
-            context = ssl._create_unverified_context()
-            with urllib.request.urlopen(req, timeout=30, context=context) as response, \
-                 open(bin_path, "wb") as out_file:
-                shutil.copyfileobj(response, out_file)
-            os.chmod(bin_path, os.stat(bin_path).st_mode | stat.S_IEXEC)
-            decky.logger.info("TorrServer download complete.")
-        except Exception as e:
-            decky.logger.error(f"Failed to download TorrServer: {e}")
+        for url in urls:
+            decky.logger.info(f"Downloading TorrServer binary from {url}...")
+            req = urllib.request.Request(
+                url,
+                headers={"User-Agent": "Mozilla/5.0 (X11; SteamOS; Linux x86_64)"}
+            )
+            try:
+                context = ssl._create_unverified_context()
+                with urllib.request.urlopen(req, timeout=30, context=context) as response, \
+                     open(bin_path, "wb") as out_file:
+                    shutil.copyfileobj(response, out_file)
+                if os.path.exists(bin_path) and os.path.getsize(bin_path) > 1000000:
+                    os.chmod(bin_path, 0o755)
+                    decky.logger.info("TorrServer download complete.")
+                    return
+                else:
+                    decky.logger.warning(f"Downloaded TorrServer from {url} is too small, trying next...")
+            except Exception as e:
+                decky.logger.error(f"Failed to download TorrServer from {url}: {e}")
 
     def start_torrserver_thread(self):
         bin_dir = os.path.join(self.settings_dir, "bin")
         bin_path = os.path.join(bin_dir, "TorrServer")
         db_path = os.path.join(self.settings_dir, "torrserver")
 
-        if not os.path.exists(bin_path):
+        if not os.path.exists(bin_path) or os.path.getsize(bin_path) < 1000000:
             home = get_user_home()
             candidates = [
+                os.path.join(self.plugin_dir, "bin", "TorrServer"),
                 os.path.join(home, "homebrew", "settings", "lampa-deck", "bin", "TorrServer"),
                 os.path.join(home, "homebrew", "settings", "Lampa Deck", "bin", "TorrServer"),
-                os.path.join(self.plugin_dir, "bin", "TorrServer"),
             ]
             for c in candidates:
                 if os.path.isfile(c) and os.path.getsize(c) > 1000000:
@@ -270,10 +278,10 @@ class Plugin:
                     except Exception as ce:
                         decky.logger.warning(f"Failed to copy TorrServer from {c}: {ce}")
 
-        if not os.path.exists(bin_path):
+        if not os.path.exists(bin_path) or os.path.getsize(bin_path) < 1000000:
             self.download_torrserver_binary(bin_path)
 
-        if not os.path.exists(bin_path):
+        if not os.path.exists(bin_path) or os.path.getsize(bin_path) < 1000000:
             decky.logger.error("Cannot start TorrServer: binary not found.")
             return
 
