@@ -103,25 +103,22 @@ class Plugin:
 
     async def get_torrserver_status(self) -> bool:
         threading.Thread(target=self._save_last_url, daemon=True).start()
-        
+
         # 1. Check if our own process is active
         if self.torrserver_process is not None and self.torrserver_process.poll() is None:
             return True
-            
-        # 2. Fallback: check if any TorrServer is already running on port 8090
+
+        # 2. Check if TorrServer is running and responding on port 8090
         try:
             context = ssl._create_unverified_context()
-            url = f"http://127.0.0.1:{self.port_torrserver}/"
-            # Just request the home page or settings, timeout quickly
+            url = f"http://127.0.0.1:{self.port_torrserver}/echo"
             req = urllib.request.Request(url, method="GET")
-            with urllib.request.urlopen(req, timeout=0.8, context=context) as resp:
+            with urllib.request.urlopen(req, timeout=1.0, context=context) as resp:
                 if resp.status == 200:
                     return True
         except Exception:
             pass
 
-        # Clear process ref if it died
-        self.torrserver_process = None
         return False
 
     async def restart_torrserver(self) -> bool:
@@ -254,6 +251,24 @@ class Plugin:
         bin_dir = os.path.join(self.settings_dir, "bin")
         bin_path = os.path.join(bin_dir, "TorrServer")
         db_path = os.path.join(self.settings_dir, "torrserver")
+
+        if not os.path.exists(bin_path):
+            home = get_user_home()
+            candidates = [
+                os.path.join(home, "homebrew", "settings", "lampa-deck", "bin", "TorrServer"),
+                os.path.join(home, "homebrew", "settings", "Lampa Deck", "bin", "TorrServer"),
+                os.path.join(self.plugin_dir, "bin", "TorrServer"),
+            ]
+            for c in candidates:
+                if os.path.isfile(c) and os.path.getsize(c) > 1000000:
+                    decky.logger.info(f"Found existing TorrServer binary at {c}, copying to {bin_path}")
+                    os.makedirs(bin_dir, exist_ok=True)
+                    try:
+                        shutil.copy2(c, bin_path)
+                        os.chmod(bin_path, 0o755)
+                        break
+                    except Exception as ce:
+                        decky.logger.warning(f"Failed to copy TorrServer from {c}: {ce}")
 
         if not os.path.exists(bin_path):
             self.download_torrserver_binary(bin_path)
@@ -466,6 +481,29 @@ class Plugin:
                     self.send_header("Content-Length", str(len(body)))
                     self.end_headers()
                     self.wfile.write(body)
+                    return
+
+                # ── /play?url=...&player=... ──────────────────────────────
+                elif parsed_url.path == "/play":
+                    q = urllib.parse.parse_qs(parsed_url.query)
+                    url = q.get("url", [""])[0]
+                    player = q.get("player", ["/usr/bin/vlc"])[0]
+                    if url:
+                        decky.logger.info(f"External player requested: {player} for {url[:60]}")
+                        try:
+                            cmd = player.split() + [url]
+                            subprocess.Popen(cmd, env=_build_gui_env())
+                            self.send_response(200)
+                            self.send_header("Content-Type", "application/json")
+                            self._send_cors_headers()
+                            self.end_headers()
+                            self.wfile.write(b'{"status": "ok"}')
+                            return
+                        except Exception as e:
+                            decky.logger.error(f"Failed to launch external player {player}: {e}")
+                            self.send_error(500, str(e))
+                            return
+                    self.send_error(400, "Missing url")
                     return
 
                 # ── /save_url?url=... ─────────────────────────────────────
